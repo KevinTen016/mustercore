@@ -1,0 +1,109 @@
+.banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 500;
+  background: var(--bg-card);
+  border-top: 1px solid var(--line);
+  padding: 1.25rem clamp(1rem, 4vw, 2.5rem);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.28);
+  animation: slideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.inner {
+  max-width: var(--max-w);
+  margin-inline: auto;
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.text {
+  flex: 1;
+  min-width: 240px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.35rem;
+}
+
+.desc {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+  max-width: none;
+}
+
+.desc a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Alle drei Buttons gleich auffällig (TTDSG) */
+.btnAll {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+  color: var(--black);
+  font-weight: 600;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius);
+  font-size: 0.84rem;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition);
+}
+
+.btnAll:hover { box-shadow: var(--shadow-accent); transform: translateY(-1px); }
+
+.btnNec {
+  background: var(--overlay-hover);
+  color: var(--text-dim);
+  border: 1px solid var(--line);
+  font-weight: 400;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius);
+  font-size: 0.84rem;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.btnNec:hover { border-color: var(--text-dim); color: var(--text); }
+
+.btnSettings {
+  background: transparent;
+  color: var(--text-sub);
+  border: none;
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 0.65rem 0.5rem;
+  transition: color var(--transition);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.btnSettings:hover { color: var(--text-dim); }
+
+@media (max-width: 600px) {
+  .inner { flex-direction: column; align-items: stretch; }
+  .actions { flex-direction: column; }
+  .btnAll, .btnNec { text-align: center; }
+}

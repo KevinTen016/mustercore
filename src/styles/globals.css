@@ -1,0 +1,245 @@
+@import './tokens.css';
+@import './reset.css';
+
+/* ================================================
+   TYPOGRAFIE
+   ================================================ */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+h1 { font-size: clamp(2.4rem, 5.5vw, 4.2rem); }
+h2 { font-size: clamp(1.8rem, 3.5vw, 2.8rem); }
+h3 { font-size: clamp(1.3rem, 2.5vw, 1.9rem); }
+h4 { font-size: clamp(1.1rem, 2vw, 1.45rem); }
+
+p {
+  font-size: clamp(1rem, 1.5vw, 1.08rem);
+  color: var(--text-dim);
+  line-height: 1.74;
+  max-width: 68ch;
+}
+
+strong { font-weight: 600; color: var(--text); }
+
+/* ================================================
+   LAYOUT-UTILITIES
+   ================================================ */
+.container {
+  width: 100%;
+  max-width: var(--max-w);
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 2.5rem);
+}
+
+.section {
+  padding-block: var(--section-py);
+}
+
+/* ================================================
+   BUTTON-SYSTEM
+   ================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  cursor: pointer;
+  transition: all var(--transition);
+  border: none;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+/* Primär — Akzentfarbe (Sand/Beige dunkel resp. Waldgrün hell) */
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+  color: var(--bg);
+}
+
+[data-theme="dark"] .btn-primary,
+:root .btn-primary {
+  color: #0C1620;
+}
+
+[data-theme="light"] .btn-primary {
+  color: #FDFAF5;
+}
+
+.btn-primary:hover {
+  box-shadow: var(--shadow-accent);
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+
+.btn-secondary:hover {
+  border-color: var(--text-dim);
+  color: var(--text);
+  background: var(--overlay-hover);
+}
+
+.btn-ghost {
+  background: var(--overlay-hover);
+  color: var(--text-dim);
+}
+
+.btn-ghost:hover { color: var(--text); background: var(--border-sub); }
+
+.btn-lg {
+  padding: 0.95rem 2rem;
+  font-size: 0.95rem;
+}
+
+.btn-sm {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.8rem;
+}
+
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* ================================================
+   CARD
+   ================================================ */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* ================================================
+   FORMULAR
+   ================================================ */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.form-control {
+  background: var(--bg-input);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-family: var(--font-body);
+  font-weight: 300;
+  outline: none;
+  width: 100%;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.form-control:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--overlay-focus);
+}
+
+.form-control::placeholder { color: var(--text-sub); }
+
+select.form-control {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23C9A87C' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  padding-right: 2.2rem;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+
+/* ================================================
+   BADGE
+   ================================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.67rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badge-accent {
+  background: var(--accent-muted);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.badge-green {
+  background: var(--green-muted);
+  color: var(--green);
+  border: 1px solid color-mix(in srgb, var(--green) 25%, transparent);
+}
+
+/* ================================================
+   ANIMATIONEN
+   ================================================ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.animate-fadeup { animation: fadeUp 0.55s cubic-bezier(0.4, 0, 0.2, 1) both; }
+
+/* ================================================
+   RESPONSIVE UTILITIES
+   ================================================ */
+@media (max-width: 768px) {
+  h1 { letter-spacing: -0.015em; }
+}
+
+/* ================================================
+   ACCESSIBILITY
+   ================================================ */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  background: var(--accent);
+  color: var(--bg);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 600;
+  z-index: 9999;
+  text-decoration: none;
+  transition: top 0.2s;
+}
+
+.skip-link:focus { top: 1rem; }

@@ -1,0 +1,135 @@
+/* ================================================
+   WEBCORE DESIGN TOKENS v2.0
+   Dark mode:  Tiefes Navy + warmes Beige/Sand
+   Light mode: Warmes Creme + Dunkelgrün (Wald)
+   ================================================ */
+
+/* ── Dark Mode (Standard) ─────────────────────── */
+:root,
+[data-theme="dark"] {
+
+  /* Hintergründe */
+  --black:        #0C1620;
+  --surface:      #101E2C;
+  --surface-2:    #142433;
+  --surface-3:    #192C3F;
+
+  /* Rahmen */
+  --border:       #1E324A;
+  --border-sub:   rgba(237, 220, 195, 0.07);
+
+  /* Akzent — warmes Sand / Beige */
+  --accent:       #C9A87C;
+  --accent-light: #E0C49A;
+  --accent-dark:  #9E7840;
+  --accent-muted: rgba(201, 168, 124, 0.10);
+
+  /* Text */
+  --white:        #EDE0C8;
+  --white-dim:    rgba(237, 224, 200, 0.62);
+  --white-sub:    rgba(237, 224, 200, 0.07);
+
+  /* Status */
+  --red:          #E06060;
+  --red-muted:    rgba(224, 96, 96, 0.13);
+  --green:        #4CAF82;
+  --green-muted:  rgba(76, 175, 130, 0.12);
+  --blue:         #6BA3D6;
+  --blue-muted:   rgba(107, 163, 214, 0.12);
+
+  /* Semantische Aliases */
+  --bg:           var(--black);
+  --bg-card:      var(--surface-2);
+  --bg-card-2:    var(--surface-3);
+  --bg-input:     var(--surface-3);
+  --text:         var(--white);
+  --text-dim:     var(--white-dim);
+  --text-sub:     rgba(237, 224, 200, 0.38);
+  --line:         var(--border);
+  --line-sub:     var(--border-sub);
+
+  /* Overlays */
+  --overlay-hover: rgba(237, 224, 200, 0.04);
+  --overlay-focus: rgba(201, 168, 124, 0.12);
+
+  /* Schatten */
+  --shadow-sm:    0 1px 4px rgba(0, 0, 0, 0.35);
+  --shadow-md:    0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-lg:    0 12px 40px rgba(0, 0, 0, 0.55);
+  --shadow-accent: 0 4px 24px rgba(201, 168, 124, 0.28);
+}
+
+/* ── Light Mode ───────────────────────────────── */
+[data-theme="light"] {
+
+  /* Hintergründe — warmes Creme/Beige */
+  --black:        #F3EDE4;
+  --surface:      #FDFAF5;
+  --surface-2:    #EAE3D8;
+  --surface-3:    #E1D8CB;
+
+  /* Rahmen */
+  --border:       #CBBEA8;
+  --border-sub:   rgba(30, 20, 10, 0.06);
+
+  /* Akzent — Dunkel-Waldgrün */
+  --accent:       #1E3C2C;
+  --accent-light: #2E6448;
+  --accent-dark:  #122419;
+  --accent-muted: rgba(30, 60, 44, 0.08);
+
+  /* Text */
+  --white:        #1A1612;
+  --white-dim:    rgba(26, 22, 18, 0.62);
+  --white-sub:    rgba(26, 22, 18, 0.06);
+
+  /* Status */
+  --red:          #C0392B;
+  --red-muted:    rgba(192, 57, 43, 0.10);
+  --green:        #1E6B42;
+  --green-muted:  rgba(30, 107, 66, 0.10);
+  --blue:         #1B4F8A;
+  --blue-muted:   rgba(27, 79, 138, 0.10);
+
+  /* Semantische Aliases */
+  --bg:           var(--black);
+  --bg-card:      var(--surface);
+  --bg-card-2:    var(--surface-2);
+  --bg-input:     var(--surface-3);
+  --text:         var(--white);
+  --text-dim:     var(--white-dim);
+  --text-sub:     rgba(26, 22, 18, 0.38);
+  --line:         var(--border);
+  --line-sub:     var(--border-sub);
+
+  /* Overlays */
+  --overlay-hover: rgba(26, 22, 18, 0.04);
+  --overlay-focus: rgba(30, 60, 44, 0.10);
+
+  /* Schatten */
+  --shadow-sm:    0 1px 4px rgba(30, 20, 10, 0.08);
+  --shadow-md:    0 4px 16px rgba(30, 20, 10, 0.12);
+  --shadow-lg:    0 12px 40px rgba(30, 20, 10, 0.18);
+  --shadow-accent: 0 4px 24px rgba(30, 60, 44, 0.20);
+}
+
+/* ================================================
+   LAYOUT & TYPOGRAFIE-TOKENS (theme-unabhängig)
+   ================================================ */
+:root {
+  --radius:       8px;
+  --radius-lg:    14px;
+  --radius-xl:    22px;
+
+  --transition:   0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+
+  --font-display: 'Manrope', system-ui, -apple-system, sans-serif;
+  --font-body:    'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+
+  --nav-h:        68px;
+  --max-w:        1160px;
+  --max-w-text:   720px;
+  --section-py:   clamp(3.5rem, 9vw, 7rem);
+  --card-p:       clamp(1.25rem, 3vw, 2rem);
+}

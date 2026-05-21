@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin — WebCore</title>
+  <link rel="preconnect" href="https://fonts.bunny.net" />
+  <link href="https://fonts.bunny.net/css?family=manrope:300,400,500,600,700&display=swap" rel="stylesheet" />
+  <style>
+    /* ════════════════════════════════════════════════════
+       WEBCORE ADMIN — Design Tokens
+       Dark Navy + Warm Beige / Sand
+    ════════════════════════════════════════════════════ */
+    :root {
+      --black:       #0C1620;
+      --surface:     #101E2C;
+      --surface-2:   #142433;
+      --surface-3:   #192C3F;
+      --border:      #1E324A;
+      --border-sub:  rgba(237,220,195,0.07);
+
+      --beige:       #C9A87C;
+      --beige-light: #E0C49A;
+      --beige-dark:  #9E7840;
+      --beige-muted: rgba(201,168,124,0.12);
+
+      --white:       #EDE0C8;
+      --white-dim:   rgba(237,224,200,0.62);
+      --white-sub:   rgba(237,224,200,0.08);
+
+      --red:         #E06060;
+      --red-muted:   rgba(224,96,96,0.13);
+      --green:       #4CAF82;
+      --green-muted: rgba(76,175,130,0.13);
+      --blue:        #6BA3D6;
+      --blue-muted:  rgba(107,163,214,0.13);
+
+      --radius:      8px;
+      --radius-lg:   14px;
+      --transition:  0.22s cubic-bezier(0.4,0,0.2,1);
+      --font:        'Manrope', system-ui, sans-serif;
+      --sidebar-w:   252px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      font-size: 16px;
+      scrollbar-color: var(--beige-dark) var(--surface);
+      scrollbar-width: thin;
+    }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--surface); }
+    ::-webkit-scrollbar-thumb { background: var(--beige-dark); border-radius: 3px; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--font);
+      font-weight: 400;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font-family: var(--font); cursor: pointer; }
+    input, select, textarea { font-family: var(--font); }
+    ::selection { background: var(--beige); color: var(--black); }
+
+    /* ── Login ──────────────────────────────────── */
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 40%, rgba(201,168,124,0.05) 0%, transparent 70%),
+        var(--black);
+      padding: 1.5rem;
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 380px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 2rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-box::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(to right, var(--beige-dark), var(--beige-light), var(--beige-dark));
+    }
+
+    .login-logo {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-logo__name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--white);
+    }
+
+    .login-logo__name span { color: var(--beige); }
+
+    .login-logo__sub {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--white-dim);
+      margin-top: 0.25rem;
+    }
+
+    .login-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .login-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      margin-bottom: 1rem;
+    }
+
+    .login-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--white-dim);
+    }
+
+    .login-input {
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.7rem 0.9rem;
+      color: var(--white);
+      font-size: 0.9rem;
+      font-family: var(--font);
+      outline: none;
+      width: 100%;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .login-input:focus {
+      border-color: var(--beige);
+      box-shadow: 0 0 0 3px rgba(201,168,124,0.12);
+    }
+
+    .login-error {
+      font-size: 0.78rem;
+      color: var(--red);
+      min-height: 1.2rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 0.8rem;
+      background: linear-gradient(135deg, var(--beige) 0%, var(--beige-dark) 100%);
+      color: var(--black);
+      border: none;
+      border-radius: var(--radius);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: all var(--transition);
+      margin-top: 0.5rem;
+    }
+
+    .login-btn:hover {
+      box-shadow: 0 4px 20px rgba(201,168,124,0.35);
+      transform: translateY(-1px);
+    }
+
+    /* ── App Layout ─────────────────────────────── */
+    #app { display: none; min-height: 100vh; }
+    #app.visible { display: flex; }
+
+    /* ── Sidebar ────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .sidebar__brand {
+      padding: 1.5rem 1.25rem 1.25rem;
+      border-bottom: 1px solid var(--border-sub);
+    }
+
+    .sidebar__brand-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--white);
+    }
+
+    .sidebar__brand-name span { color: var(--beige); }
+
+    .sidebar__brand-sub {
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--white-dim);
+      margin-top: 0.2rem;
+    }
+
+    .sidebar__label {
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--beige);
+      padding: 1.25rem 1.25rem 0.5rem;
+      opacity: 0.8;
+    }
+
+    .sidebar__nav {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.72rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.88rem;
+      font-weight: 400;
+      color: var(--white-dim);
+      cursor: pointer;
+      transition: all var(--transition);
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      letter-spacing: 0.01em;
+    }
+
+    .nav-item:hover { background: var(--white-sub); color: var(--white); }
+    .nav-item--active { background: var(--beige-muted); color: var(--beige); font-weight: 500; }
+    .nav-item svg { width: 17px; height: 17px; flex-shrink: 0; opacity: 0.7; }
+    .nav-item--active svg { opacity: 1; }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--beige);
+      color: var(--black);
+      font-size: 0.58rem;
+      font-weight: 700;
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    .sidebar__footer {
+      padding: 1rem 0.75rem;
+      border-top: 1px solid var(--border-sub);
+    }
+
+    .logout-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      border-radius: var(--radius);
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--white-dim);
+      font-size: 0.78rem;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+    /* ── Main ───────────────────────────────────── */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1.1rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar__title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--white);
+    }
+
+    .topbar__meta {
+      font-size: 0.78rem;
+      color: var(--white-dim);
+      margin-top: 0.1rem;
+    }
+
+    .topbar__burger {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--white);
+      padding: 0.4rem;
+      cursor: pointer;
+      border-radius: var(--radius);
+      transition: background var(--transition);
+    }
+
+    .topbar__burger:hover { background: var(--white-sub); }
+
+    .content { padding: 2rem 2.5rem; flex: 1; }
+
+    /* ── Tabs ───────────────────────────────────── */
+    .tab-panel { display: none; }
+    .tab-panel--active { display: block; animation: fadeIn 0.25s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Cards ──────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .card__header {
+      padding: 1.25rem 1.75rem;
+      border-bottom: 1px solid var(--border-sub);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .card__title {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--white);
+    }
+
+    .card__subtitle {
+      font-size: 0.78rem;
+      color: var(--white-dim);
+      margin-top: 0.2rem;
+    }
+
+    /* ── Stats ──────────────────────────────────── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.75rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(to right, var(--beige-dark), var(--beige-light));
+    }
+
+    .stat-card--green::before {
+      background: linear-gradient(to right, #2a6640, var(--green));
+    }
+
+    .stat-card--red::before {
+      background: linear-gradient(to right, #7a2828, var(--red));
+    }
+
+    .stat-card--blue::before {
+      background: linear-gradient(to right, #1a3a6a, var(--blue));
+    }
+
+    .stat-card__label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--white-dim);
+      margin-bottom: 0.6rem;
+    }
+
+    .stat-card__value {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-card__value--beige { color: var(--beige); }
+    .stat-card__value--green { color: var(--green); }
+    .stat-card__value--red   { color: var(--red); }
+    .stat-card__value--dim   { color: var(--white-dim); }
+
+    .stat-card__sub {
+      font-size: 0.72rem;
+      color: var(--white-dim);
+      margin-top: 0.4rem;
+    }
+
+    /* ── Tables ─────────────────────────────────── */
+    .table-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+
+    thead th {
+      padding: 0.85rem 1.25rem;
+      text-align: left;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--white-dim);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      background: var(--surface-2);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border-sub);
+      transition: background var(--transition);
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(237,224,200,0.025); }
+
+    tbody td {
+      padding: 1rem 1.25rem;
+      color: var(--white-dim);
+      vertical-align: middle;
+      line-height: 1.4;
+    }
+
+    tbody td:first-child { color: var(--white); font-weight: 500; }
+
+    .loading-row td { text-align: center; padding: 2.5rem; color: var(--white-dim); font-size: 0.82rem; }
+    .empty-row td   { text-align: center; padding: 2.5rem; color: var(--white-dim); font-size: 0.82rem; }
+
+    /* ── Badges ─────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .badge--aktiv         { background: var(--green-muted); color: var(--green);    border: 1px solid rgba(76,175,130,0.25); }
+    .badge--trial         { background: var(--beige-muted); color: var(--beige);    border: 1px solid rgba(201,168,124,0.25); }
+    .badge--inaktiv       { background: var(--red-muted);   color: var(--red);      border: 1px solid rgba(224,96,96,0.25); }
+    .badge--neu           { background: var(--beige-muted); color: var(--beige);    border: 1px solid rgba(201,168,124,0.25); }
+    .badge--kontaktiert   { background: var(--blue-muted);  color: var(--blue);     border: 1px solid rgba(107,163,214,0.25); }
+    .badge--demo_gesendet { background: var(--green-muted); color: var(--green);    border: 1px solid rgba(76,175,130,0.25); }
+    .badge--abgesagt      { background: var(--red-muted);   color: var(--red);      border: 1px solid rgba(224,96,96,0.25); }
+    .badge--gelesen       { background: var(--white-sub);   color: var(--white-dim); border: 1px solid var(--border-sub); }
+    .badge--basis         { background: var(--white-sub);   color: var(--white-dim); border: 1px solid var(--border); }
+    .badge--standard      { background: var(--beige-muted); color: var(--beige);    border: 1px solid rgba(201,168,124,0.25); }
+    .badge--premium       { background: rgba(76,175,130,0.10); color: var(--green); border: 1px solid rgba(76,175,130,0.25); }
+
+    /* ── Buttons ────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1.1rem;
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition);
+      border: none;
+      white-space: nowrap;
+    }
+
+    .btn-beige {
+      background: linear-gradient(135deg, var(--beige), var(--beige-dark));
+      color: var(--black);
+    }
+    .btn-beige:hover { box-shadow: 0 4px 16px rgba(201,168,124,0.4); transform: translateY(-1px); }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--white-dim);
+    }
+    .btn-ghost:hover { border-color: var(--white-dim); color: var(--white); background: var(--white-sub); }
+
+    .btn-danger {
+      background: var(--red-muted);
+      border: 1px solid rgba(224,96,96,0.3);
+      color: var(--red);
+    }
+    .btn-danger:hover { background: rgba(224,96,96,0.22); }
+
+    .btn-success {
+      background: var(--green-muted);
+      border: 1px solid rgba(76,175,130,0.3);
+      color: var(--green);
+    }
+    .btn-success:hover { background: rgba(76,175,130,0.22); }
+
+    .btn-sm { padding: 0.38rem 0.75rem; font-size: 0.76rem; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+    /* ── Form ───────────────────────────────────── */
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1rem; }
+
+    .form-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--white-dim);
+    }
+
+    .form-control {
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.72rem 1rem;
+      color: var(--white);
+      font-size: 0.9rem;
+      font-family: var(--font);
+      font-weight: 400;
+      outline: none;
+      width: 100%;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      -webkit-appearance: none;
+    }
+
+    .form-control:focus {
+      border-color: var(--beige);
+      box-shadow: 0 0 0 3px rgba(201,168,124,0.10);
+    }
+
+    .form-control::placeholder { color: rgba(237,224,200,0.25); }
+
+    select.form-control {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23C9A87C' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.85rem center;
+      padding-right: 2.2rem;
+      cursor: pointer;
+    }
+
+    select.form-control option { background: var(--surface-2); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    /* ── Filters ────────────────────────────────── */
+    .filters {
+      display: flex;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filters .form-control {
+      margin: 0;
+      padding: 0.4rem 0.7rem;
+      font-size: 0.78rem;
+      width: auto;
+    }
+
+    /* ── Section divider ────────────────────────── */
+    .section-divider {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--beige);
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-sub);
+      opacity: 0.85;
+    }
+
+    /* ── Chart ──────────────────────────────────── */
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      height: 110px;
+    }
+
+    .bar-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+
+    .bar-count { font-size: 0.6rem; color: var(--white-dim); min-height: 0.8rem; line-height: 1; }
+
+    .bar-wrap {
+      width: 100%;
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      background: var(--surface-3);
+      border-radius: 4px 4px 0 0;
+      overflow: hidden;
+      min-height: 4px;
+    }
+
+    .bar-fill {
+      width: 100%;
+      background: linear-gradient(180deg, var(--beige-light) 0%, var(--beige-dark) 100%);
+      border-radius: 4px 4px 0 0;
+      transition: height 0.5s cubic-bezier(0.4,0,0.2,1);
+      min-height: 3px;
+    }
+
+    .bar-fill--green { background: linear-gradient(180deg, var(--green) 0%, #2a6640 100%); }
+
+    .bar-label {
+      font-size: 0.6rem;
+      font-weight: 600;
+      color: var(--white-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Status chart ───────────────────────────── */
+    .ratio-chart { display: flex; flex-direction: column; gap: 1rem; }
+
+    .ratio-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 36px 46px;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .ratio-label {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.78rem;
+      color: var(--white-dim);
+    }
+
+    .ratio-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    .ratio-bar-wrap { background: var(--surface-3); border-radius: 4px; height: 7px; overflow: hidden; }
+
+    .ratio-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+      min-width: 3px;
+    }
+
+    .ratio-num { text-align: right; color: var(--white); font-weight: 500; font-size: 0.84rem; }
+    .ratio-pct { color: var(--white-dim); font-size: 0.68rem; text-align: right; }
+
+    /* ── Toast ──────────────────────────────────── */
+    #toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 0.6rem;
+    }
+
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.8rem;
+      min-width: 220px;
+      max-width: 320px;
+      border: 1px solid;
+      animation: toastIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(20px) scale(0.95); }
+      to   { opacity: 1; transform: translateX(0) scale(1); }
+    }
+
+    .toast--success { background: rgba(76,175,130,0.1);  border-color: rgba(76,175,130,0.3);  color: var(--green); }
+    .toast--error   { background: rgba(224,96,96,0.1);   border-color: rgba(224,96,96,0.3);   color: var(--red); }
+    .toast--info    { background: var(--beige-muted);    border-color: rgba(201,168,124,0.3); color: var(--beige); }
+
+    /* ── Sidebar overlay ────────────────────────── */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      z-index: 150;
+      backdrop-filter: blur(2px);
+    }
+    .sidebar-overlay.visible { display: block; }
+
+    /* ── Kunden card ─────────────────────────────── */
+    .kunde-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border-sub);
+      transition: background var(--transition);
+    }
+
+    .kunde-row:last-child { border-bottom: none; }
+    .kunde-row:hover { background: rgba(237,224,200,0.025); }
+
+    .kunde-row__name { font-weight: 500; color: var(--white); }
+    .kunde-row__meta { font-size: 0.72rem; color: var(--white-dim); margin-top: 0.15rem; }
+
+    /* ── Demo-Anfrage card ─────────────────────── */
+    .demo-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .demo-card__info { flex: 1; min-width: 180px; }
+    .demo-card__name { font-size: 0.95rem; font-weight: 600; color: var(--white); }
+    .demo-card__firma { font-size: 0.78rem; color: var(--beige); margin-top: 0.1rem; }
+    .demo-card__meta  { font-size: 0.72rem; color: var(--white-dim); margin-top: 0.25rem; line-height: 1.6; }
+    .demo-card__actions { display: flex; gap: 0.4rem; align-items: center; flex-shrink: 0; flex-wrap: wrap; }
+
+    /* ── Nachricht card ─────────────────────────── */
+    .msg-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.1rem 1.5rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .msg-card--unread { border-left: 2px solid var(--beige); }
+    .msg-card__info { flex: 1; min-width: 180px; }
+    .msg-card__name { font-size: 0.88rem; font-weight: 500; color: var(--white); }
+    .msg-card__betreff { font-size: 0.78rem; color: var(--white-dim); margin-top: 0.15rem; }
+
+    /* ── Responsive ─────────────────────────────── */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+        z-index: 200;
+      }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .topbar { padding: 0.75rem 1rem; }
+      .topbar__burger { display: flex; align-items: center; justify-content: center; }
+      .content { padding: 1rem; }
+      .stats-row { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+      .stat-card { padding: 1rem 1.25rem; }
+      .stat-card__value { font-size: 1.8rem; }
+      .form-row { grid-template-columns: 1fr; }
+      .filters { flex-direction: column; align-items: stretch; }
+      .filters .form-control { width: 100%; }
+      #toast-container { right: 0.75rem; bottom: 0.75rem; left: 0.75rem; }
+      .toast { max-width: 100%; min-width: unset; }
+      .kunde-row { grid-template-columns: 1fr auto; }
+      .kunde-row > *:not(:first-child):not(:last-child) { display: none; }
+    }
+
+    @media (max-width: 600px) {
+      .table-wrap { overflow-x: visible; }
+      table, thead, tbody, th, td, tr { display: block; width: 100%; }
+      thead { position: absolute; top: -9999px; left: -9999px; }
+      tbody tr {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 0.75rem;
+        padding: 0.6rem 0.75rem;
+      }
+      tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.4rem 0;
+        border-bottom: 1px solid var(--border-sub);
+        font-size: 0.82rem;
+      }
+      tbody td:last-child { border-bottom: none; }
+      tbody td::before {
+        content: attr(data-label);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--beige);
+        flex-shrink: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     LOGIN
+═══════════════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo__name">Web<span>Core</span></div>
+      <div class="login-logo__sub">Admin · Interne Verwaltung</div>
+    </div>
+
+    <div class="login-group">
+      <label class="login-label" for="login-user">Benutzername</label>
+      <input class="login-input" type="text" id="login-user" placeholder="admin" autocomplete="username" />
+    </div>
+    <div class="login-group">
+      <label class="login-label" for="login-pass">Passwort</label>
+      <input class="login-input" type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+
+    <div class="login-error" id="login-error"></div>
+    <button class="login-btn" id="login-btn">Anmelden</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     HAUPT-APP
+═══════════════════════════════════════════════ -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+<div id="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__brand">
+      <div class="sidebar__brand-name">Web<span>Core</span></div>
+      <div class="sidebar__brand-sub">Admin-Bereich</div>
+    </div>
+
+    <div class="sidebar__label">Navigation</div>
+
+    <nav class="sidebar__nav">
+      <button class="nav-item nav-item--active" data-tab="stats">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M2 14V8M6 14V5M10 14V9M14 14V3"/><path d="M1 14h14" stroke-linecap="round"/>
+        </svg>
+        Übersicht
+      </button>
+
+      <button class="nav-item" data-tab="kunden">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="6" cy="5" r="2.5"/>
+          <path d="M1 13c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5"/>
+          <path d="M12 7.5a2 2 0 100-4 2 2 0 000 4M15 13c0-2.2-1.3-3.5-3-3.5"/>
+        </svg>
+        Kunden
+        <span class="nav-badge" id="badge-kunden">0</span>
+      </button>
+
+      <button class="nav-item" data-tab="demos">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="1" y="2" width="14" height="10" rx="2"/>
+          <path d="M5 15h6M8 12v3" stroke-linecap="round"/>
+        </svg>
+        Demo-Anfragen
+        <span class="nav-badge" id="badge-demos">0</span>
+      </button>
+
+      <button class="nav-item" data-tab="nachrichten">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="1" y="3" width="14" height="10" rx="2"/>
+          <path d="M1 6l7 4 7-4" stroke-linecap="round"/>
+        </svg>
+        Nachrichten
+        <span class="nav-badge" id="badge-nachrichten">0</span>
+      </button>
+    </nav>
+
+    <div class="sidebar__footer">
+      <button class="logout-btn" id="logout-btn">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M10 8H2M6 5l-3 3 3 3"/><path d="M6 2h6a1 1 0 011 1v10a1 1 0 01-1 1H6"/>
+        </svg>
+        Abmelden
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <button class="topbar__burger" id="topbar-burger" aria-label="Menü öffnen">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <line x1="3" y1="6" x2="19" y2="6"/><line x1="3" y1="11" x2="19" y2="11"/><line x1="3" y1="16" x2="19" y2="16"/>
+        </svg>
+      </button>
+      <div>
+        <div class="topbar__title" id="topbar-title">Übersicht</div>
+        <div class="topbar__meta" id="topbar-meta">Kennzahlen & Aktivität</div>
+      </div>
+      <span id="topbar-date" style="font-size:0.72rem;color:var(--white-dim);"></span>
+    </div>
+
+    <div class="content">
+
+      <!-- ══ TAB: STATS ══════════════════════════ -->
+      <div class="tab-panel tab-panel--active" id="tab-stats">
+
+        <div class="stats-row" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:1.25rem;">
+          <div class="stat-card">
+            <div class="stat-card__label">Aktive Kunden</div>
+            <div class="stat-card__value stat-card__value--beige" id="dash-kunden">—</div>
+            <div class="stat-card__sub">Abonnenten gesamt</div>
+          </div>
+          <div class="stat-card stat-card--green">
+            <div class="stat-card__label">MRR</div>
+            <div class="stat-card__value stat-card__value--green" id="dash-mrr">—</div>
+            <div class="stat-card__sub">Monatl. Wiederkehrend</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card__label">Demo-Anfragen</div>
+            <div class="stat-card__value" id="dash-demos">—</div>
+            <div class="stat-card__sub">Dieser Monat</div>
+          </div>
+          <div class="stat-card stat-card--blue">
+            <div class="stat-card__label">Nachrichten</div>
+            <div class="stat-card__value stat-card__value--dim" id="dash-nachrichten">—</div>
+            <div class="stat-card__sub">Unbearbeitet</div>
+          </div>
+        </div>
+
+        <!-- Umsatz-Detail -->
+        <div class="stat-card stat-card--green" style="margin-bottom:1.5rem;grid-column:1/-1;">
+          <div class="stat-card__label">Umsatz-Übersicht (Netto zzgl. 19% USt)</div>
+          <div style="display:flex;gap:3rem;flex-wrap:wrap;margin-top:0.75rem;">
+            <div>
+              <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(76,175,130,0.7);margin-bottom:0.2rem;">BASIS Kunden</div>
+              <div class="stat-card__value stat-card__value--dim" id="dash-basis-count" style="font-size:1.5rem;">—</div>
+            </div>
+            <div>
+              <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(76,175,130,0.7);margin-bottom:0.2rem;">STANDARD Kunden</div>
+              <div class="stat-card__value stat-card__value--green" id="dash-std-count" style="font-size:1.5rem;">—</div>
+            </div>
+            <div>
+              <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(76,175,130,0.7);margin-bottom:0.2rem;">PREMIUM Kunden</div>
+              <div class="stat-card__value stat-card__value--green" id="dash-prem-count" style="font-size:1.5rem;">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paket-Verteilung -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+          <div class="card">
+            <div class="card__header">
+              <div><div class="card__title">Letzte 6 Monate</div><div class="card__subtitle">Neue Kunden</div></div>
+            </div>
+            <div style="padding:1rem 1.5rem 1.5rem;" id="chart-kunden">
+              <div class="bar-chart" id="bar-chart"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card__header">
+              <div><div class="card__title">Paket-Verteilung</div><div class="card__subtitle">Aktive Abonnenten</div></div>
+            </div>
+            <div style="padding:1rem 1.5rem 1.5rem;" id="chart-pakete"></div>
+          </div>
+        </div>
+
+        <!-- Neueste Demo-Anfragen -->
+        <div class="card">
+          <div class="card__header">
+            <div><div class="card__title">Neueste Demo-Anfragen</div><div class="card__subtitle">Letzte 5 Eingänge</div></div>
+            <button class="btn btn-ghost btn-sm" onclick="switchTab('demos')">Alle ansehen →</button>
+          </div>
+          <div id="recent-demos-list" style="padding:0.5rem 0;">
+            <div style="text-align:center;color:var(--white-dim);font-size:0.82rem;padding:1.5rem;">Wird geladen…</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══ TAB: KUNDEN ═════════════════════════ -->
+      <div class="tab-panel" id="tab-kunden">
+        <div class="card">
+          <div class="card__header">
+            <div><div class="card__title">Kunden-Übersicht</div><div class="card__subtitle">Alle aktiven und ehemaligen Abonnenten</div></div>
+            <div class="filters">
+              <select class="form-control" id="filter-paket" style="width:130px;">
+                <option value="">Alle Pakete</option>
+                <option value="BASIS">BASIS</option>
+                <option value="STANDARD">STANDARD</option>
+                <option value="PREMIUM">PREMIUM</option>
+              </select>
+              <select class="form-control" id="filter-k-status" style="width:130px;">
+                <option value="">Alle Status</option>
+                <option value="aktiv">Aktiv</option>
+                <option value="trial">Trial</option>
+                <option value="inaktiv">Inaktiv</option>
+              </select>
+              <input class="form-control" type="text" id="filter-k-search" placeholder="Name suchen…" style="width:160px;" />
+            </div>
+          </div>
+          <div id="kunden-list" style="padding:0.25rem 0 0.5rem;">
+            <div style="text-align:center;color:var(--white-dim);font-size:0.82rem;padding:2rem;">Wird geladen…</div>
+          </div>
+        </div>
+
+        <!-- Neuen Kunden anlegen -->
+        <div class="card">
+          <div class="card__header" style="cursor:pointer;" onclick="toggleNewKunde()">
+            <div><div class="card__title">+ Neuen Kunden anlegen</div><div class="card__subtitle">Manuell nach Vertragsabschluss</div></div>
+            <span id="new-kunde-arrow" style="color:var(--beige);font-size:1.2rem;">▸</span>
+          </div>
+          <div id="new-kunde-form" style="display:none;padding:1.5rem;border-top:1px solid var(--border-sub);">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Unternehmensname *</label>
+                <input class="form-control" type="text" id="nk-name" placeholder="z.B. Salon Harmonie" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Branche</label>
+                <select class="form-control" id="nk-branche">
+                  <option value="">Wählen…</option>
+                  <option>Friseursalon</option><option>Arztpraxis</option><option>Autowerkstatt</option>
+                  <option>Physiotherapie</option><option>Fitness / Yoga</option><option>Tattoostudio</option><option>Sonstige</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Paket *</label>
+                <select class="form-control" id="nk-paket">
+                  <option value="BASIS">BASIS – 99 €/Mo</option>
+                  <option value="STANDARD" selected>STANDARD – 129 €/Mo</option>
+                  <option value="PREMIUM">PREMIUM – 149 €/Mo</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">E-Mail</label>
+                <input class="form-control" type="email" id="nk-email" placeholder="info@unternehmen.de" />
+              </div>
+            </div>
+            <button class="btn btn-beige" onclick="addKunde()">Kunden anlegen</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ TAB: DEMOS ══════════════════════════ -->
+      <div class="tab-panel" id="tab-demos">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card__header">
+            <div><div class="card__title">Demo-Anfragen</div><div class="card__subtitle">Eingehende Leads vom Kontaktformular</div></div>
+            <div class="filters">
+              <select class="form-control" id="filter-d-status" style="width:150px;">
+                <option value="">Alle Status</option>
+                <option value="neu">Neu</option>
+                <option value="kontaktiert">Kontaktiert</option>
+                <option value="abgesagt">Abgesagt</option>
+              </select>
+              <button class="btn btn-ghost btn-sm" onclick="renderDemos()">⟳</button>
+            </div>
+          </div>
+          <div id="demos-list" style="padding:0.75rem 1rem 1rem;">
+            <div style="text-align:center;color:var(--white-dim);font-size:0.82rem;padding:2rem;">Wird geladen…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ TAB: NACHRICHTEN ════════════════════ -->
+      <div class="tab-panel" id="tab-nachrichten">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card__header">
+            <div><div class="card__title">Nachrichten</div><div class="card__subtitle">Eingänge über das Kontaktformular</div></div>
+            <div class="filters">
+              <select class="form-control" id="filter-n-status" style="width:140px;">
+                <option value="">Alle</option>
+                <option value="neu">Ungelesen</option>
+                <option value="gelesen">Gelesen</option>
+              </select>
+              <button class="btn btn-ghost btn-sm" onclick="renderNachrichten()">⟳</button>
+            </div>
+          </div>
+          <div id="nachrichten-list" style="padding:0.75rem 1rem 1rem;">
+            <div style="text-align:center;color:var(--white-dim);font-size:0.82rem;padding:2rem;">Wird geladen…</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.content -->
+  </div><!-- /.main -->
+</div><!-- /#app -->
+
+<div id="toast-container"></div>
+
+<script>
+'use strict';
+
+const TAB_META = {
+  stats:        { title: 'Übersicht',      meta: 'Kennzahlen & Aktivität' },
+  kunden:       { title: 'Kunden',         meta: 'Aktive Abonnenten verwalten' },
+  demos:        { title: 'Demo-Anfragen',  meta: 'Eingehende Leads' },
+  nachrichten:  { title: 'Nachrichten',    meta: 'Kontaktformular-Eingänge' },
+};
+
+// ═══ DATA (server-backed) ═════════════════════════
+let KUNDEN       = [];
+let DEMOS        = [];
+let NACHRICHTEN  = [];
+
+async function loadData() {
+  const [kunden, demos, nachrichten] = await Promise.all([
+    fetch('/api/kunden').then(r => r.json()),
+    fetch('/api/demos').then(r => r.json()),
+    fetch('/api/nachrichten').then(r => r.json()),
+  ]);
+  KUNDEN      = kunden;
+  DEMOS       = demos;
+  NACHRICHTEN = nachrichten;
+}
+
+// ═══ AUTH ═════════════════════════════════════════
+document.getElementById('login-btn').addEventListener('click', login);
+document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+
+async function login() {
+  const u   = document.getElementById('login-user').value.trim();
+  const p   = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-error');
+  err.textContent = '';
+
+  let res;
+  try {
+    res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: u, password: p }),
+    });
+  } catch {
+    err.textContent = 'Verbindungsfehler. Bitte erneut versuchen.';
+    return;
+  }
+
+  if (res.ok) {
+    await loadData();
+    showApp();
+  } else {
+    const data = await res.json().catch(() => ({}));
+    err.textContent = data.error || 'Benutzername oder Passwort falsch.';
+  }
+}
+
+document.getElementById('logout-btn').addEventListener('click', async () => {
+  await fetch('/api/auth/logout', { method: 'POST' });
+  location.reload();
+});
+
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  document.getElementById('topbar-date').textContent =
+    new Date().toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+  renderAll();
+}
+
+// Check existing session on page load
+(async () => {
+  try {
+    const res = await fetch('/api/auth/check');
+    const { authenticated } = await res.json();
+    if (authenticated) {
+      await loadData();
+      showApp();
+    }
+  } catch {
+    // Network error — stay on login screen
+  }
+})();
+
+// ═══ NAVIGATION ═══════════════════════════════════
+document.querySelectorAll('.nav-item[data-tab]').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+function switchTab(tabId) {
+  if (window.innerWidth <= 768) closeSidebar();
+  document.querySelectorAll('.nav-item[data-tab]').forEach(b =>
+    b.classList.toggle('nav-item--active', b.dataset.tab === tabId));
+  document.querySelectorAll('.tab-panel').forEach(p =>
+    p.classList.toggle('tab-panel--active', p.id === `tab-${tabId}`));
+  const m = TAB_META[tabId];
+  if (m) {
+    document.getElementById('topbar-title').textContent = m.title;
+    document.getElementById('topbar-meta').textContent  = m.meta;
+  }
+  if (tabId === 'kunden')      renderKunden();
+  if (tabId === 'demos')       renderDemos();
+  if (tabId === 'nachrichten') renderNachrichten();
+}
+
+// ═══ SIDEBAR MOBILE ═══════════════════════════════
+function openSidebar()  { document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebar-overlay').classList.add('visible'); }
+function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('visible'); }
+document.getElementById('topbar-burger').addEventListener('click', openSidebar);
+document.getElementById('sidebar-overlay').addEventListener('click', closeSidebar);
+
+// ═══ RENDER ALL ═══════════════════════════════════
+function renderAll() {
+  renderStats();
+  renderKunden();
+  renderDemos();
+  renderNachrichten();
+  updateBadges();
+}
+
+// ═══ STATS / DASHBOARD ════════════════════════════
+function renderStats() {
+  const aktive = KUNDEN.filter(k => k.status === 'aktiv' || k.status === 'trial').length;
+  const basis   = KUNDEN.filter(k => k.paket === 'BASIS'    && (k.status === 'aktiv' || k.status === 'trial')).length;
+  const std     = KUNDEN.filter(k => k.paket === 'STANDARD' && (k.status === 'aktiv' || k.status === 'trial')).length;
+  const prem    = KUNDEN.filter(k => k.paket === 'PREMIUM'  && (k.status === 'aktiv' || k.status === 'trial')).length;
+  const mrr     = basis * 99 + std * 129 + prem * 149;
+  const demoN   = DEMOS.filter(d => d.status === 'neu').length;
+  const nachN   = NACHRICHTEN.filter(n => n.status === 'neu').length;
+
+  document.getElementById('dash-kunden').textContent      = aktive;
+  document.getElementById('dash-mrr').textContent         = `${mrr} €`;
+  document.getElementById('dash-demos').textContent       = DEMOS.length;
+  document.getElementById('dash-nachrichten').textContent = nachN;
+  document.getElementById('dash-basis-count').textContent = basis;
+  document.getElementById('dash-std-count').textContent   = std;
+  document.getElementById('dash-prem-count').textContent  = prem;
+
+  renderBarChart();
+  renderPaketeChart(basis, std, prem);
+  renderRecentDemos();
+}
+
+function renderBarChart() {
+  const labels = ['Dez', 'Jan', 'Feb', 'Mär', 'Apr', 'Mai'];
+  const data   = [1, 1, 1, 1, 0, 1]; // mock
+  const max    = Math.max(...data, 1);
+  const today  = new Date().toLocaleString('de-DE', { month: 'short' });
+  document.getElementById('bar-chart').innerHTML = labels.map((l, i) => {
+    const isNow = l === today.slice(0,3);
+    return `
+      <div class="bar-group">
+        <div class="bar-count">${data[i] || ''}</div>
+        <div class="bar-wrap">
+          <div class="bar-fill${isNow ? ' bar-fill--green' : ''}" style="height:${Math.round(data[i]/max*100)}%"></div>
+        </div>
+        <div class="bar-label" style="${isNow ? 'color:var(--green);' : ''}">${l}</div>
+      </div>`;
+  }).join('');
+}
+
+function renderPaketeChart(basis, std, prem) {
+  const el = document.getElementById('chart-pakete');
+  const total = basis + std + prem || 1;
+  const rows = [
+    { label: 'BASIS',    count: basis, color: 'var(--white-dim)' },
+    { label: 'STANDARD', count: std,   color: 'var(--beige)' },
+    { label: 'PREMIUM',  count: prem,  color: 'var(--green)' },
+  ];
+  el.innerHTML = `<div class="ratio-chart">${rows.map(r => {
+    const pct = ((r.count / total) * 100).toFixed(1);
+    return `
+      <div class="ratio-row">
+        <div class="ratio-label"><span class="ratio-dot" style="background:${r.color}"></span>${r.label}</div>
+        <div class="ratio-bar-wrap"><div class="ratio-bar-fill" style="width:${pct}%;background:${r.color}"></div></div>
+        <div class="ratio-num">${r.count}</div>
+        <div class="ratio-pct">${pct}%</div>
+      </div>`;
+  }).join('')}</div>`;
+}
+
+function renderRecentDemos() {
+  const el = document.getElementById('recent-demos-list');
+  const recent = [...DEMOS].sort((a,b) => b.eingegangen.localeCompare(a.eingegangen)).slice(0, 5);
+  if (!recent.length) {
+    el.innerHTML = '<p style="text-align:center;color:var(--white-dim);font-size:0.82rem;padding:1.25rem;">Keine Demo-Anfragen vorhanden.</p>';
+    return;
+  }
+  el.innerHTML = recent.map(d => `
+    <div style="display:flex;align-items:center;gap:1rem;padding:0.75rem 1.5rem;border-bottom:1px solid var(--border-sub);">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:0.88rem;font-weight:500;color:var(--white);">${esc(d.name)} — <span style="color:var(--beige);">${esc(d.firma)}</span></div>
+        <div style="font-size:0.72rem;color:var(--white-dim);margin-top:0.1rem;">${esc(d.branche)} · ${esc(d.telefon)}</div>
+      </div>
+      <span class="badge badge--${d.status}">${d.status}</span>
+      <span style="font-size:0.7rem;color:var(--white-dim);">${formatDate(d.eingegangen)}</span>
+    </div>`).join('');
+}
+
+// ═══ KUNDEN ═══════════════════════════════════════
+function renderKunden() {
+  const listEl = document.getElementById('kunden-list');
+  const search = document.getElementById('filter-k-search')?.value.toLowerCase() || '';
+  const paket  = document.getElementById('filter-paket')?.value || '';
+  const status = document.getElementById('filter-k-status')?.value || '';
+
+  let list = KUNDEN.filter(k =>
+    (!search || k.name.toLowerCase().includes(search) || (k.email||'').toLowerCase().includes(search)) &&
+    (!paket  || k.paket === paket) &&
+    (!status || k.status === status)
+  );
+
+  if (!list.length) {
+    listEl.innerHTML = '<p style="text-align:center;color:var(--white-dim);font-size:0.82rem;padding:2rem;">Keine Kunden gefunden.</p>';
+    return;
+  }
+
+  listEl.innerHTML = `
+    <!-- Header-Zeile -->
+    <div class="kunde-row" style="padding:0.6rem 1.5rem;border-bottom:1px solid var(--border);background:var(--surface-2);">
+      <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--white-dim);">Unternehmen</div>
+      <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--white-dim);">Branche</div>
+      <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--white-dim);">Paket</div>
+      <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--white-dim);">Status</div>
+      <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--white-dim);">Seit</div>
+      <div></div>
+    </div>
+    ${list.map(k => `
+    <div class="kunde-row">
+      <div>
+        <div class="kunde-row__name">${esc(k.name)}</div>
+        <div class="kunde-row__meta">${esc(k.email || '—')}</div>
+      </div>
+      <div style="font-size:0.82rem;color:var(--white-dim);">${esc(k.branche || '—')}</div>
+      <span class="badge badge--${k.paket.toLowerCase()}">${esc(k.paket)}</span>
+      <span class="badge badge--${k.status}">${statusLabel(k.status)}</span>
+      <div style="font-size:0.78rem;color:var(--white-dim);">${formatDate(k.since)}</div>
+      <div style="display:flex;gap:0.3rem;">
+        <button class="btn btn-ghost btn-sm" onclick="toggleKundeStatus('${k.id}')" title="Status wechseln">⇄</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteKunde('${k.id}')">—</button>
+      </div>
+    </div>`).join('')}`;
+}
+
+document.getElementById('filter-paket')?.addEventListener('change', renderKunden);
+document.getElementById('filter-k-status')?.addEventListener('change', renderKunden);
+let _ksTimer;
+document.getElementById('filter-k-search')?.addEventListener('input', () => { clearTimeout(_ksTimer); _ksTimer = setTimeout(renderKunden, 300); });
+
+function toggleNewKunde() {
+  const f = document.getElementById('new-kunde-form');
+  const a = document.getElementById('new-kunde-arrow');
+  const open = f.style.display === 'none';
+  f.style.display = open ? 'block' : 'none';
+  a.textContent   = open ? '▾' : '▸';
+}
+
+async function addKunde() {
+  const name    = document.getElementById('nk-name').value.trim();
+  const branche = document.getElementById('nk-branche').value;
+  const paket   = document.getElementById('nk-paket').value;
+  const email   = document.getElementById('nk-email').value.trim();
+
+  if (!name) { toast('Bitte Unternehmensname eingeben.', 'error'); return; }
+
+  const res = await fetch('/api/kunden', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, branche, paket, email }),
+  });
+
+  if (res.ok) {
+    const kunde = await res.json();
+    KUNDEN.push(kunde);
+    toast(`Kunde "${name}" angelegt.`, 'success');
+    toggleNewKunde();
+    renderAll();
+    document.getElementById('nk-name').value  = '';
+    document.getElementById('nk-email').value = '';
+  } else {
+    toast('Fehler beim Anlegen des Kunden.', 'error');
+  }
+}
+
+async function toggleKundeStatus(id) {
+  const k = KUNDEN.find(x => x.id === id);
+  if (!k) return;
+  const next = { aktiv: 'trial', trial: 'inaktiv', inaktiv: 'aktiv' };
+  const newStatus = next[k.status] || 'aktiv';
+
+  const res = await fetch(`/api/kunden/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status: newStatus }),
+  });
+
+  if (res.ok) {
+    k.status = newStatus;
+    renderAll();
+    toast(`Status geändert: ${statusLabel(newStatus)}`, 'info');
+  } else {
+    toast('Fehler beim Statuswechsel.', 'error');
+  }
+}
+
+async function deleteKunde(id) {
+  if (!confirm('Kunden wirklich entfernen?')) return;
+
+  const res = await fetch(`/api/kunden/${id}`, { method: 'DELETE' });
+  if (res.ok) {
+    KUNDEN = KUNDEN.filter(k => k.id !== id);
+    renderAll();
+    toast('Kunde entfernt.', 'success');
+  } else {
+    toast('Fehler beim Entfernen.', 'error');
+  }
+}
+
+// ═══ DEMOS ════════════════════════════════════════
+function renderDemos() {
+  const el = document.getElementById('demos-list');
+  const sf = document.getElementById('filter-d-status')?.value || '';
+  const list = DEMOS.filter(d => !sf || d.status === sf);
+
+  if (!list.length) {
+    el.innerHTML = '<p style="text-align:center;color:var(--white-dim);font-size:0.82rem;padding:2rem;">Keine Demo-Anfragen gefunden.</p>';
+    return;
+  }
+
+  el.innerHTML = list.map(d => {
+    const statusText = { neu: 'Neu', kontaktiert: 'Kontaktiert', demo_gesendet: 'Demo gesendet', abgesagt: 'Abgesagt' }[d.status] || d.status;
+    const quizTags = d.features && d.features.length
+      ? d.features.map(f => `<span style="display:inline-block;padding:0.15rem 0.5rem;background:var(--white-sub);border:1px solid var(--border-sub);border-radius:4px;font-size:0.68rem;color:var(--white-dim);">${esc(f)}</span>`).join(' ')
+      : '';
+    return `
+    <div class="demo-card">
+      <div class="demo-card__info" style="flex:1;min-width:0;">
+        <div class="demo-card__name">${esc(d.name)}</div>
+        <div class="demo-card__firma">${esc(d.firma)}</div>
+        <div class="demo-card__meta">
+          ${esc(d.branche)} · <a href="mailto:${esc(d.email)}" style="color:var(--beige);">${esc(d.email)}</a> · ${esc(d.telefon)}<br>
+          Eingegangen: ${formatDate(d.eingegangen)}
+        </div>
+        ${d.stil ? `<div style="font-size:0.74rem;color:var(--white-dim);margin-top:0.4rem;">Stil: <span style="color:var(--beige);">${esc(d.stil)}</span></div>` : ''}
+        ${quizTags ? `<div style="margin-top:0.4rem;display:flex;flex-wrap:wrap;gap:0.3rem;">${quizTags}</div>` : ''}
+        ${d.statusWebsite ? `<div style="font-size:0.74rem;color:var(--white-dim);margin-top:0.3rem;">Website: ${esc(d.statusWebsite)}</div>` : ''}
+      </div>
+      <div class="demo-card__actions">
+        <span class="badge badge--${d.status}">${statusText}</span>
+        ${d.status === 'neu' ? `<button class="btn btn-success btn-sm" onclick="setDemoStatus('${d.id}','kontaktiert')">Kontaktiert</button>` : ''}
+        ${d.status === 'kontaktiert' ? `<button class="btn btn-success btn-sm" onclick="setDemoStatus('${d.id}','demo_gesendet')">Demo gesendet</button>` : ''}
+        ${d.status !== 'abgesagt' ? `<button class="btn btn-ghost btn-sm" onclick="setDemoStatus('${d.id}','abgesagt')">Absagen</button>` : ''}
+        <button class="btn btn-danger btn-sm" onclick="deleteDemo('${d.id}')">Löschen</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('filter-d-status')?.addEventListener('change', renderDemos);
+
+async function setDemoStatus(id, status) {
+  const res = await fetch(`/api/demos/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  });
+  if (res.ok) {
+    const d = DEMOS.find(x => x.id === id);
+    if (d) d.status = status;
+    renderAll();
+    toast('Demo-Status aktualisiert.', 'success');
+  } else {
+    toast('Fehler beim Aktualisieren.', 'error');
+  }
+}
+
+async function deleteDemo(id) {
+  if (!confirm('Anfrage löschen?')) return;
+  const res = await fetch(`/api/demos/${id}`, { method: 'DELETE' });
+  if (res.ok) {
+    DEMOS = DEMOS.filter(d => d.id !== id);
+    renderAll();
+    toast('Anfrage gelöscht.', 'success');
+  } else {
+    toast('Fehler beim Löschen.', 'error');
+  }
+}
+
+// ═══ NACHRICHTEN ══════════════════════════════════
+function renderNachrichten() {
+  const el = document.getElementById('nachrichten-list');
+  const sf = document.getElementById('filter-n-status')?.value || '';
+  const list = NACHRICHTEN.filter(n => !sf || n.status === sf);
+
+  if (!list.length) {
+    el.innerHTML = '<p style="text-align:center;color:var(--white-dim);font-size:0.82rem;padding:2rem;">Keine Nachrichten gefunden.</p>';
+    return;
+  }
+
+  el.innerHTML = list.map(n => `
+    <div class="msg-card ${n.status === 'neu' ? 'msg-card--unread' : ''}">
+      <div class="msg-card__info" style="flex:1;">
+        <div class="msg-card__name">${esc(n.name)} — <a href="mailto:${esc(n.email)}" style="color:var(--beige);font-size:0.82rem;">${esc(n.email)}</a></div>
+        <div class="msg-card__betreff">${esc(n.betreff)}</div>
+        ${n.text ? `<div style="font-size:0.76rem;color:var(--white-dim);margin-top:0.3rem;">${esc(n.text.slice(0,100))}${n.text.length > 100 ? '…' : ''}</div>` : ''}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.5rem;flex-shrink:0;">
+        <span style="font-size:0.7rem;color:var(--white-dim);">${formatDate(n.eingegangen)}</span>
+        <span class="badge badge--${n.status}">${n.status === 'neu' ? 'Neu' : 'Gelesen'}</span>
+        ${n.status === 'neu' ? `<button class="btn btn-ghost btn-sm" onclick="setNachrichtStatus('${n.id}','gelesen')">Als gelesen markieren</button>` : ''}
+        <button class="btn btn-danger btn-sm" onclick="deleteNachricht('${n.id}')">Löschen</button>
+      </div>
+    </div>`).join('');
+}
+
+document.getElementById('filter-n-status')?.addEventListener('change', renderNachrichten);
+
+async function setNachrichtStatus(id, status) {
+  const res = await fetch(`/api/nachrichten/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  });
+  if (res.ok) {
+    const n = NACHRICHTEN.find(x => x.id === id);
+    if (n) n.status = status;
+    renderAll();
+  } else {
+    toast('Fehler beim Aktualisieren.', 'error');
+  }
+}
+
+async function deleteNachricht(id) {
+  if (!confirm('Nachricht löschen?')) return;
+  const res = await fetch(`/api/nachrichten/${id}`, { method: 'DELETE' });
+  if (res.ok) {
+    NACHRICHTEN = NACHRICHTEN.filter(n => n.id !== id);
+    renderAll();
+    toast('Nachricht gelöscht.', 'success');
+  } else {
+    toast('Fehler beim Löschen.', 'error');
+  }
+}
+
+// ═══ BADGES ═══════════════════════════════════════
+function updateBadges() {
+  document.getElementById('badge-kunden').textContent      = KUNDEN.filter(k => k.status === 'aktiv' || k.status === 'trial').length;
+  document.getElementById('badge-demos').textContent       = DEMOS.filter(d => d.status === 'neu').length;
+  document.getElementById('badge-nachrichten').textContent = NACHRICHTEN.filter(n => n.status === 'neu').length;
+}
+
+// ═══ UTILS ════════════════════════════════════════
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function formatDate(iso) {
+  if (!iso) return '—';
+  const [y, m, d] = iso.split('-');
+  return `${d}.${m}.${y}`;
+}
+
+function statusLabel(s) {
+  return { aktiv: 'Aktiv', trial: 'Trial', inaktiv: 'Inaktiv' }[s] || s;
+}
+
+function toast(message, type = 'info', duration = 3500) {
+  const c  = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className   = `toast toast--${type}`;
+  el.textContent = message;
+  c.appendChild(el);
+  setTimeout(() => {
+    el.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    el.style.opacity    = '0';
+    el.style.transform  = 'translateX(12px)';
+    setTimeout(() => el.remove(), 320);
+  }, duration);
+}
+</script>
+</body>
+</html>
