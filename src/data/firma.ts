@@ -10,8 +10,8 @@ export const FIRMA = {
   inhaber:          '[Nachname, Vorname]',           // TODO
   strasse:          '[Straße und Hausnummer]',        // TODO
   plz:              '[PLZ]',                          // TODO
-  ort:              'Braunschweig',
-  bundesland:       'Niedersachsen',
+  ort:              '[Stadt]',                           // TODO
+  bundesland:       '[Bundesland]',                      // TODO
   land:             'Deutschland',
   email:            '[email@webcore.de]',             // TODO
   emailKontakt:     '[kontakt@webcore.de]',           // TODO

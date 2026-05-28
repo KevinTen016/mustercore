@@ -1,0 +1,13 @@
+# Dev image: dependencies baked in at build time.
+# Source code is mounted via docker-compose volume (.:/app),
+# node_modules stays in the anonymous /app/node_modules volume.
+FROM node:20.18-alpine3.20
+WORKDIR /app
+
+COPY package.json package-lock.json* ./
+RUN npm ci --legacy-peer-deps
+
+COPY . .
+RUN npx prisma generate
+
+EXPOSE 3000

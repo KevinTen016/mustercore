@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { BRANCHEN } from '@/data/branchen';
 
@@ -28,9 +29,9 @@ const EMPTY: QuizData = {
 };
 
 const STILE = [
-  { key: 'modern',     label: 'Modern & Minimalistisch', desc: 'Klare Linien, viel Weißraum, zeitlos' },
-  { key: 'klassisch',  label: 'Klassisch & Seriös',      desc: 'Vertrauensvoll, professionell, bewährt' },
-  { key: 'lebendig',   label: 'Frisch & Lebendig',       desc: 'Farbenfroh, einladend, ausdrucksstark' },
+  { key: 'modern',    label: 'Modern & Minimalistisch', desc: 'Klare Linien, viel Weißraum, zeitlos' },
+  { key: 'klassisch', label: 'Klassisch & Seriös',      desc: 'Vertrauensvoll, professionell, bewährt' },
+  { key: 'lebendig',  label: 'Frisch & Lebendig',       desc: 'Farbenfroh, einladend, ausdrucksstark' },
 ];
 
 const FEATURES_LIST = [
@@ -48,6 +49,7 @@ const STATUS_LIST = [
   { key: 'agentur', label: 'Ja, von einer Agentur', desc: 'Professionell, aber veraltet oder zu teuer' },
 ];
 
+// Step order: 1=Branche, 2=Stil, 3=Features, 4=StatusWebsite, 5=Kontakt (last)
 const TOTAL = 5;
 
 // ── Component ──────────────────────────────────────────────────────────
@@ -78,18 +80,19 @@ export default function DemoQuiz() {
       if (data.branche === '__andere__' && !data.brancheCustom.trim()) return 'Bitte beschreiben Sie Ihre Branche.';
     }
     if (step === 2) {
+      if (!data.stil) return 'Bitte wählen Sie einen Stil aus.';
+      if (data.stil === '__andere__' && !data.stilCustom.trim()) return 'Bitte beschreiben Sie den gewünschten Stil.';
+    }
+    // step 3 (features) has no required field
+    if (step === 4) {
+      if (!data.statusWebsite) return 'Bitte wählen Sie eine Option aus.';
+    }
+    if (step === 5) {
       if (!data.name.trim())  return 'Bitte geben Sie Ihren Namen ein.';
       if (!data.firma.trim()) return 'Bitte geben Sie den Firmennamen ein.';
       if (!data.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email))
         return 'Bitte geben Sie eine gültige E-Mail-Adresse ein.';
       if (!data.telefon.trim()) return 'Bitte geben Sie Ihre Telefonnummer ein.';
-    }
-    if (step === 3) {
-      if (!data.stil) return 'Bitte wählen Sie einen Stil aus.';
-      if (data.stil === '__andere__' && !data.stilCustom.trim()) return 'Bitte beschreiben Sie den gewünschten Stil.';
-    }
-    if (step === 5) {
-      if (!data.statusWebsite) return 'Bitte wählen Sie eine Option aus.';
     }
     return '';
   }
@@ -106,7 +109,8 @@ export default function DemoQuiz() {
     setStep(s => Math.max(s - 1, 1));
   }
 
-  async function submit() {
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
     const err = validate();
     if (err) { setError(err); return; }
     setLoading(true);
@@ -135,7 +139,7 @@ export default function DemoQuiz() {
     return (
       <div style={card}>
         <div style={{ textAlign: 'center', padding: '2rem 0' }}>
-          <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'var(--accent-muted)', border: '1.5px solid var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', fontSize: '1.4rem' }}>✓</div>
+          <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'var(--accent-muted)', border: '1.5px solid var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', fontSize: '1.4rem' }} aria-hidden="true">✓</div>
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 700, color: 'var(--text)', marginBottom: '0.75rem' }}>
             Anfrage eingegangen!
           </h2>
@@ -143,23 +147,28 @@ export default function DemoQuiz() {
             Wir erstellen Ihre persönliche Demo-Website und melden uns{' '}
             <strong style={{ color: 'var(--text)' }}>innerhalb von 24 Stunden</strong> bei Ihnen.
           </p>
+          <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', marginTop: '2rem', flexWrap: 'wrap' }}>
+            <Link href="/preise" className="btn btn-secondary">Preise ansehen</Link>
+            <Link href="/" className="btn btn-secondary">Zur Startseite</Link>
+          </div>
         </div>
       </div>
     );
   }
 
-  const progress = ((step - 1) / (TOTAL - 1)) * 100;
+  // Progress: both bar and label use the same formula
+  const progressPct = Math.round((step / TOTAL) * 100);
 
   return (
-    <div style={card}>
+    <form style={card} onSubmit={submit} noValidate>
       {/* Progress bar */}
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.45rem' }}>
           <span style={meta}>Schritt {step} von {TOTAL}</span>
-          <span style={meta}>{Math.round((step / TOTAL) * 100)} %</span>
+          <span style={meta}>{progressPct}&nbsp;%</span>
         </div>
-        <div style={{ height: 4, background: 'var(--line)', borderRadius: 99, overflow: 'hidden' }}>
-          <div style={{ height: '100%', width: `${progress}%`, background: 'var(--accent)', borderRadius: 99, transition: 'width 0.35s ease' }} />
+        <div style={{ height: 4, background: 'var(--line)', borderRadius: 99, overflow: 'hidden' }} role="progressbar" aria-valuenow={progressPct} aria-valuemin={0} aria-valuemax={100} aria-label="Fortschritt">
+          <div style={{ height: '100%', width: `${progressPct}%`, background: 'var(--accent)', borderRadius: 99, transition: 'width 0.35s ease' }} />
         </div>
       </div>
 
@@ -170,95 +179,77 @@ export default function DemoQuiz() {
           <p style={sub}>Wir passen Ihre Demo genau auf die Branche an.</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(138px, 1fr))', gap: '0.6rem', marginTop: '1.5rem' }}>
             {BRANCHEN.map(b => (
-              <button key={b.slug} type="button" onClick={() => patch('branche', b.slug)} style={tileStyle(data.branche === b.slug)}>
-                <svg viewBox="0 0 16 16" fill="currentColor" width="18" height="18" style={{ flexShrink: 0 }}>
+              <button key={b.slug} type="button" onClick={() => patch('branche', b.slug)} style={tileStyle(data.branche === b.slug)} aria-pressed={data.branche === b.slug}>
+                <svg viewBox="0 0 16 16" fill="currentColor" width="18" height="18" style={{ flexShrink: 0 }} aria-hidden="true">
                   <path d={b.icon} />
                 </svg>
                 <span style={{ fontSize: '0.82rem', fontWeight: 500, lineHeight: 1.3 }}>{b.name}</span>
               </button>
             ))}
-            <button type="button" onClick={() => patch('branche', '__andere__')} style={tileStyle(data.branche === '__andere__')}>
-              <span style={{ fontSize: '1rem' }}>✏</span>
+            <button type="button" onClick={() => patch('branche', '__andere__')} style={tileStyle(data.branche === '__andere__')} aria-pressed={data.branche === '__andere__'}>
+              <span style={{ fontSize: '1rem' }} aria-hidden="true">✏</span>
               <span style={{ fontSize: '0.82rem', fontWeight: 500 }}>Andere</span>
             </button>
           </div>
           {data.branche === '__andere__' && (
-            <input
-              type="text"
-              placeholder="Beschreiben Sie Ihre Branche …"
-              value={data.brancheCustom}
-              onChange={e => patch('brancheCustom', e.target.value)}
-              style={{ ...input, marginTop: '0.75rem' }}
-            />
+            <label style={{ ...labelStyle, marginTop: '0.75rem' }}>
+              Beschreibung
+              <input
+                type="text"
+                placeholder="Beschreiben Sie Ihre Branche …"
+                value={data.brancheCustom}
+                onChange={e => patch('brancheCustom', e.target.value)}
+                maxLength={120}
+                className="form-control"
+                style={inputOverride}
+              />
+            </label>
           )}
         </div>
       )}
 
-      {/* ── Step 2 — Kontaktdaten ── */}
+      {/* ── Step 2 — Stil ── */}
       {step === 2 && (
-        <div>
-          <h2 style={heading}>Wie können wir Sie erreichen?</h2>
-          <p style={sub}>Die Demo senden wir direkt an Ihre E-Mail-Adresse.</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginTop: '1.5rem' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.8rem' }}>
-              <label style={labelStyle}>
-                Ihr Name *
-                <input type="text" placeholder="Max Mustermann" value={data.name} onChange={e => patch('name', e.target.value)} style={input} />
-              </label>
-              <label style={labelStyle}>
-                Firmenname *
-                <input type="text" placeholder="Salon Beispiel" value={data.firma} onChange={e => patch('firma', e.target.value)} style={input} />
-              </label>
-            </div>
-            <label style={labelStyle}>
-              E-Mail-Adresse *
-              <input type="email" placeholder="max@firma.de" value={data.email} onChange={e => patch('email', e.target.value)} style={input} />
-            </label>
-            <label style={labelStyle}>
-              Telefonnummer *
-              <input type="tel" placeholder="+49 151 …" value={data.telefon} onChange={e => patch('telefon', e.target.value)} style={input} />
-            </label>
-          </div>
-        </div>
-      )}
-
-      {/* ── Step 3 — Stil ── */}
-      {step === 3 && (
         <div>
           <h2 style={heading}>Welcher Stil spricht Sie an?</h2>
           <p style={sub}>Wir richten das Design der Demo danach aus.</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginTop: '1.5rem' }}>
-            {STILE.map(s => (
-              <button key={s.key} type="button" onClick={() => patch('stil', s.key)} style={rowStyle(data.stil === s.key)}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginTop: '1.5rem' }} role="radiogroup" aria-label="Stilauswahl">
+            {STILE.map(st => (
+              <button key={st.key} type="button" onClick={() => patch('stil', st.key)} style={rowStyle(data.stil === st.key)} aria-pressed={data.stil === st.key}>
                 <div style={{ flex: 1, textAlign: 'left' }}>
-                  <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text)' }}>{s.label}</div>
-                  <div style={{ fontSize: '0.76rem', color: 'var(--text-dim)', marginTop: 2 }}>{s.desc}</div>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text)' }}>{st.label}</div>
+                  <div style={{ fontSize: '0.76rem', color: 'var(--text-dim)', marginTop: 2 }}>{st.desc}</div>
                 </div>
-                {data.stil === s.key && <span style={{ color: 'var(--accent)', fontSize: '0.85rem', flexShrink: 0 }}>✓</span>}
+                {data.stil === st.key && <span style={{ color: 'var(--accent)', fontSize: '0.85rem', flexShrink: 0 }} aria-hidden="true">✓</span>}
               </button>
             ))}
-            <button type="button" onClick={() => patch('stil', '__andere__')} style={rowStyle(data.stil === '__andere__')}>
+            <button type="button" onClick={() => patch('stil', '__andere__')} style={rowStyle(data.stil === '__andere__')} aria-pressed={data.stil === '__andere__'}>
               <div style={{ flex: 1, textAlign: 'left' }}>
                 <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text)' }}>Etwas anderes</div>
                 <div style={{ fontSize: '0.76rem', color: 'var(--text-dim)', marginTop: 2 }}>Ich beschreibe es selbst</div>
               </div>
-              {data.stil === '__andere__' && <span style={{ color: 'var(--accent)', fontSize: '0.85rem', flexShrink: 0 }}>✓</span>}
+              {data.stil === '__andere__' && <span style={{ color: 'var(--accent)', fontSize: '0.85rem', flexShrink: 0 }} aria-hidden="true">✓</span>}
             </button>
           </div>
           {data.stil === '__andere__' && (
-            <input
-              type="text"
-              placeholder="Beschreiben Sie den Stil …"
-              value={data.stilCustom}
-              onChange={e => patch('stilCustom', e.target.value)}
-              style={{ ...input, marginTop: '0.75rem' }}
-            />
+            <label style={{ ...labelStyle, marginTop: '0.75rem' }}>
+              Beschreibung
+              <input
+                type="text"
+                placeholder="Beschreiben Sie den Stil …"
+                value={data.stilCustom}
+                onChange={e => patch('stilCustom', e.target.value)}
+                maxLength={120}
+                className="form-control"
+                style={inputOverride}
+              />
+            </label>
           )}
         </div>
       )}
 
-      {/* ── Step 4 — Features ── */}
-      {step === 4 && (
+      {/* ── Step 3 — Features ── */}
+      {step === 3 && (
         <div>
           <h2 style={heading}>Welche Funktionen brauchen Sie?</h2>
           <p style={sub}>Mehrere Auswahlen möglich.</p>
@@ -266,73 +257,120 @@ export default function DemoQuiz() {
             {FEATURES_LIST.map(f => {
               const on = data.features.includes(f);
               return (
-                <button key={f} type="button" onClick={() => toggleFeature(f)} style={checkStyle(on)}>
-                  <span style={checkBox(on)}>{on && '✓'}</span>
+                <button key={f} type="button" onClick={() => toggleFeature(f)} style={checkStyle(on)} aria-pressed={on}>
+                  <span style={checkBox(on)} aria-hidden="true">{on && '✓'}</span>
                   <span style={{ fontSize: '0.87rem', color: 'var(--text)', fontWeight: on ? 500 : 400 }}>{f}</span>
                 </button>
               );
             })}
-            {/* Andere */}
             {(() => {
               const on = data.features.includes('__andere__');
               return (
-                <button type="button" onClick={() => toggleFeature('__andere__')} style={checkStyle(on)}>
-                  <span style={checkBox(on)}>{on && '✓'}</span>
+                <button type="button" onClick={() => toggleFeature('__andere__')} style={checkStyle(on)} aria-pressed={on}>
+                  <span style={checkBox(on)} aria-hidden="true">{on && '✓'}</span>
                   <span style={{ fontSize: '0.87rem', color: 'var(--text)' }}>Etwas anderes</span>
                 </button>
               );
             })()}
           </div>
           {data.features.includes('__andere__') && (
-            <input
-              type="text"
-              placeholder="Welche Funktion fehlt?"
-              value={data.featuresCustom}
-              onChange={e => patch('featuresCustom', e.target.value)}
-              style={{ ...input, marginTop: '0.75rem' }}
-            />
+            <label style={{ ...labelStyle, marginTop: '0.75rem' }}>
+              Beschreibung
+              <input
+                type="text"
+                placeholder="Welche Funktion fehlt?"
+                value={data.featuresCustom}
+                onChange={e => patch('featuresCustom', e.target.value)}
+                maxLength={300}
+                className="form-control"
+                style={inputOverride}
+              />
+            </label>
           )}
         </div>
       )}
 
-      {/* ── Step 5 — Status Website ── */}
-      {step === 5 && (
+      {/* ── Step 4 — Status Website ── */}
+      {step === 4 && (
         <div>
           <h2 style={heading}>Haben Sie bereits eine Website?</h2>
           <p style={sub}>Das hilft uns, den richtigen Startpunkt zu finden.</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginTop: '1.5rem' }}>
-            {STATUS_LIST.map(s => (
-              <button key={s.key} type="button" onClick={() => patch('statusWebsite', s.key)} style={rowStyle(data.statusWebsite === s.key)}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginTop: '1.5rem' }} role="radiogroup" aria-label="Website-Status">
+            {STATUS_LIST.map(sl => (
+              <button key={sl.key} type="button" onClick={() => patch('statusWebsite', sl.key)} style={rowStyle(data.statusWebsite === sl.key)} aria-pressed={data.statusWebsite === sl.key}>
                 <div style={{ flex: 1, textAlign: 'left' }}>
-                  <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text)' }}>{s.label}</div>
-                  <div style={{ fontSize: '0.76rem', color: 'var(--text-dim)', marginTop: 2 }}>{s.desc}</div>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text)' }}>{sl.label}</div>
+                  <div style={{ fontSize: '0.76rem', color: 'var(--text-dim)', marginTop: 2 }}>{sl.desc}</div>
                 </div>
-                {data.statusWebsite === s.key && <span style={{ color: 'var(--accent)', fontSize: '0.85rem', flexShrink: 0 }}>✓</span>}
+                {data.statusWebsite === sl.key && <span style={{ color: 'var(--accent)', fontSize: '0.85rem', flexShrink: 0 }} aria-hidden="true">✓</span>}
               </button>
             ))}
-            <button type="button" onClick={() => patch('statusWebsite', '__andere__')} style={rowStyle(data.statusWebsite === '__andere__')}>
+            <button type="button" onClick={() => patch('statusWebsite', '__andere__')} style={rowStyle(data.statusWebsite === '__andere__')} aria-pressed={data.statusWebsite === '__andere__'}>
               <div style={{ flex: 1, textAlign: 'left' }}>
                 <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text)' }}>Sonstiges</div>
                 <div style={{ fontSize: '0.76rem', color: 'var(--text-dim)', marginTop: 2 }}>Ich beschreibe es selbst</div>
               </div>
-              {data.statusWebsite === '__andere__' && <span style={{ color: 'var(--accent)', fontSize: '0.85rem', flexShrink: 0 }}>✓</span>}
+              {data.statusWebsite === '__andere__' && <span style={{ color: 'var(--accent)', fontSize: '0.85rem', flexShrink: 0 }} aria-hidden="true">✓</span>}
             </button>
           </div>
           {data.statusWebsite === '__andere__' && (
-            <input
-              type="text"
-              placeholder="Kurze Beschreibung …"
-              value={data.statusWebsiteCustom}
-              onChange={e => patch('statusWebsiteCustom', e.target.value)}
-              style={{ ...input, marginTop: '0.75rem' }}
-            />
+            <label style={{ ...labelStyle, marginTop: '0.75rem' }}>
+              Beschreibung
+              <input
+                type="text"
+                placeholder="Kurze Beschreibung …"
+                value={data.statusWebsiteCustom}
+                onChange={e => patch('statusWebsiteCustom', e.target.value)}
+                maxLength={120}
+                className="form-control"
+                style={inputOverride}
+              />
+            </label>
           )}
+        </div>
+      )}
+
+      {/* ── Step 5 — Kontaktdaten (letzter Schritt) ── */}
+      {step === 5 && (
+        <div>
+          <h2 style={heading}>Wie können wir Sie erreichen?</h2>
+          <p style={sub}>Die Demo senden wir direkt an Ihre E-Mail-Adresse.</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginTop: '1.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.8rem' }}>
+              <label style={labelStyle}>
+                Ihr Name *
+                <input type="text" placeholder="Max Mustermann" value={data.name} onChange={e => patch('name', e.target.value)} maxLength={120} required className="form-control" style={inputOverride} autoComplete="name" />
+              </label>
+              <label style={labelStyle}>
+                Firmenname *
+                <input type="text" placeholder="Salon Beispiel" value={data.firma} onChange={e => patch('firma', e.target.value)} maxLength={120} required className="form-control" style={inputOverride} autoComplete="organization" />
+              </label>
+            </div>
+            <label style={labelStyle}>
+              E-Mail-Adresse *
+              <input type="email" placeholder="max@firma.de" value={data.email} onChange={e => patch('email', e.target.value)} maxLength={120} required className="form-control" style={inputOverride} autoComplete="email" />
+            </label>
+            <label style={labelStyle}>
+              Telefonnummer *
+              <input type="tel" placeholder="+49 151 …" value={data.telefon} onChange={e => patch('telefon', e.target.value)} maxLength={120} required className="form-control" style={inputOverride} autoComplete="tel" />
+            </label>
+          </div>
         </div>
       )}
 
       {/* Error */}
       {error && (
-        <p style={{ marginTop: '1rem', color: 'var(--red)', fontSize: '0.83rem', fontWeight: 500 }}>{error}</p>
+        <p role="alert" style={{ marginTop: '1rem', color: 'var(--red)', fontSize: '0.83rem', fontWeight: 500 }}>{error}</p>
+      )}
+
+      {/* DSGVO-Hinweis — nur auf dem letzten Schritt (Kontaktdaten) */}
+      {step === TOTAL && (
+        <p style={{ marginTop: '1.25rem', fontSize: '0.76rem', color: 'var(--text-sub)', lineHeight: 1.55 }}>
+          Mit dem Absenden stimmen Sie der Verarbeitung Ihrer Kontaktdaten durch WebCore zu.{' '}
+          <a href="/datenschutz" style={{ color: 'var(--accent)', textDecoration: 'underline', textUnderlineOffset: '2px' }}>
+            Datenschutzerklärung
+          </a>
+        </p>
       )}
 
       {/* Nav buttons */}
@@ -343,12 +381,12 @@ export default function DemoQuiz() {
         }
         {step < TOTAL
           ? <button type="button" onClick={next} className="btn btn-primary">Weiter →</button>
-          : <button type="button" onClick={submit} disabled={loading} className="btn btn-primary" style={{ opacity: loading ? 0.65 : 1 }}>
+          : <button type="submit" disabled={loading} className="btn btn-primary" style={{ opacity: loading ? 0.65 : 1 }}>
               {loading ? 'Wird gesendet …' : 'Demo anfragen →'}
             </button>
         }
       </div>
-    </div>
+    </form>
   );
 }
 
@@ -387,18 +425,9 @@ const meta: React.CSSProperties = {
   textTransform: 'uppercase',
 };
 
-const input: React.CSSProperties = {
-  display: 'block',
-  width: '100%',
-  padding: '0.6rem 0.85rem',
-  background: 'var(--bg-input)',
-  border: '1px solid var(--line)',
-  borderRadius: 'var(--radius)',
-  color: 'var(--text)',
-  fontSize: '0.88rem',
-  fontFamily: 'var(--font-body)',
-  outline: 'none',
-  boxSizing: 'border-box',
+// Overrides applied on top of .form-control (which provides focus ring)
+const inputOverride: React.CSSProperties = {
+  marginTop: '0.3rem',
 };
 
 const labelStyle: React.CSSProperties = {

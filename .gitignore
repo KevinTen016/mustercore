@@ -11,12 +11,11 @@
 # Production
 /build
 
-# Env files
+# Env files — никогда не коммить реальные секреты
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
+# .env.example намеренно НЕ в этом списке — он должен быть в репозитории
 
 # Vercel
 .vercel

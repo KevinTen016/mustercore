@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
   <title>Admin — WebCore</title>
-  <link rel="preconnect" href="https://fonts.bunny.net" />
-  <link href="https://fonts.bunny.net/css?family=manrope:300,400,500,600,700&display=swap" rel="stylesheet" />
   <style>
     /* ════════════════════════════════════════════════════
        WEBCORE ADMIN — Design Tokens
@@ -39,7 +37,7 @@
       --radius:      8px;
       --radius-lg:   14px;
       --transition:  0.22s cubic-bezier(0.4,0,0.2,1);
-      --font:        'Manrope', system-ui, sans-serif;
+      --font:        system-ui, 'Segoe UI', sans-serif;
       --sidebar-w:   252px;
     }
 
@@ -163,6 +161,19 @@
       border-color: var(--beige);
       box-shadow: 0 0 0 3px rgba(201,168,124,0.12);
     }
+
+    .demo-notice {
+      background: var(--beige-muted);
+      border: 1px solid rgba(201,168,124,0.25);
+      border-radius: var(--radius);
+      padding: 0.7rem 1rem;
+      margin-bottom: 1.2rem;
+      font-size: 0.75rem;
+      color: var(--beige-light);
+      line-height: 1.6;
+    }
+    .demo-notice strong { color: var(--beige); display: block; margin-bottom: 0.25rem; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .demo-notice code { background: rgba(201,168,124,0.15); padding: 0.1em 0.35em; border-radius: 3px; font-size: 0.85em; font-family: monospace; }
 
     .login-error {
       font-size: 0.78rem;
@@ -896,6 +907,12 @@
       <div class="login-logo__sub">Admin · Interne Verwaltung</div>
     </div>
 
+    <div class="demo-notice">
+      <strong>Demo-Zugang</strong>
+      Benutzername: <code>admin</code> &nbsp;·&nbsp; Passwort: <code>demo1234</code><br>
+      Alle Daten sind fiktiv. Nur zur Demonstration.
+    </div>
+
     <div class="login-group">
       <label class="login-label" for="login-user">Benutzername</label>
       <input class="login-input" type="text" id="login-user" placeholder="admin" autocomplete="username" />
@@ -1056,7 +1073,7 @@
         <div class="card">
           <div class="card__header">
             <div><div class="card__title">Neueste Demo-Anfragen</div><div class="card__subtitle">Letzte 5 Eingänge</div></div>
-            <button class="btn btn-ghost btn-sm" onclick="switchTab('demos')">Alle ansehen →</button>
+            <button class="btn btn-ghost btn-sm" id="btn-alle-demos">Alle ansehen →</button>
           </div>
           <div id="recent-demos-list" style="padding:0.5rem 0;">
             <div style="text-align:center;color:var(--white-dim);font-size:0.82rem;padding:1.5rem;">Wird geladen…</div>
@@ -1093,7 +1110,7 @@
 
         <!-- Neuen Kunden anlegen -->
         <div class="card">
-          <div class="card__header" style="cursor:pointer;" onclick="toggleNewKunde()">
+          <div class="card__header" style="cursor:pointer;" id="new-kunde-header">
             <div><div class="card__title">+ Neuen Kunden anlegen</div><div class="card__subtitle">Manuell nach Vertragsabschluss</div></div>
             <span id="new-kunde-arrow" style="color:var(--beige);font-size:1.2rem;">▸</span>
           </div>
@@ -1126,7 +1143,7 @@
                 <input class="form-control" type="email" id="nk-email" placeholder="info@unternehmen.de" />
               </div>
             </div>
-            <button class="btn btn-beige" onclick="addKunde()">Kunden anlegen</button>
+            <button class="btn btn-beige" id="btn-add-kunde">Kunden anlegen</button>
           </div>
         </div>
       </div>
@@ -1143,7 +1160,7 @@
                 <option value="kontaktiert">Kontaktiert</option>
                 <option value="abgesagt">Abgesagt</option>
               </select>
-              <button class="btn btn-ghost btn-sm" onclick="renderDemos()">⟳</button>
+              <button class="btn btn-ghost btn-sm" id="btn-refresh-demos">⟳</button>
             </div>
           </div>
           <div id="demos-list" style="padding:0.75rem 1rem 1rem;">
@@ -1163,7 +1180,7 @@
                 <option value="neu">Ungelesen</option>
                 <option value="gelesen">Gelesen</option>
               </select>
-              <button class="btn btn-ghost btn-sm" onclick="renderNachrichten()">⟳</button>
+              <button class="btn btn-ghost btn-sm" id="btn-refresh-nachrichten">⟳</button>
             </div>
           </div>
           <div id="nachrichten-list" style="padding:0.75rem 1rem 1rem;">
@@ -1178,485 +1195,7 @@
 
 <div id="toast-container"></div>
 
-<script>
-'use strict';
+<script src="/admin.js" defer></script>
 
-const TAB_META = {
-  stats:        { title: 'Übersicht',      meta: 'Kennzahlen & Aktivität' },
-  kunden:       { title: 'Kunden',         meta: 'Aktive Abonnenten verwalten' },
-  demos:        { title: 'Demo-Anfragen',  meta: 'Eingehende Leads' },
-  nachrichten:  { title: 'Nachrichten',    meta: 'Kontaktformular-Eingänge' },
-};
-
-// ═══ DATA (server-backed) ═════════════════════════
-let KUNDEN       = [];
-let DEMOS        = [];
-let NACHRICHTEN  = [];
-
-async function loadData() {
-  const [kunden, demos, nachrichten] = await Promise.all([
-    fetch('/api/kunden').then(r => r.json()),
-    fetch('/api/demos').then(r => r.json()),
-    fetch('/api/nachrichten').then(r => r.json()),
-  ]);
-  KUNDEN      = kunden;
-  DEMOS       = demos;
-  NACHRICHTEN = nachrichten;
-}
-
-// ═══ AUTH ═════════════════════════════════════════
-document.getElementById('login-btn').addEventListener('click', login);
-document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
-
-async function login() {
-  const u   = document.getElementById('login-user').value.trim();
-  const p   = document.getElementById('login-pass').value;
-  const err = document.getElementById('login-error');
-  err.textContent = '';
-
-  let res;
-  try {
-    res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: u, password: p }),
-    });
-  } catch {
-    err.textContent = 'Verbindungsfehler. Bitte erneut versuchen.';
-    return;
-  }
-
-  if (res.ok) {
-    await loadData();
-    showApp();
-  } else {
-    const data = await res.json().catch(() => ({}));
-    err.textContent = data.error || 'Benutzername oder Passwort falsch.';
-  }
-}
-
-document.getElementById('logout-btn').addEventListener('click', async () => {
-  await fetch('/api/auth/logout', { method: 'POST' });
-  location.reload();
-});
-
-function showApp() {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app').classList.add('visible');
-  document.getElementById('topbar-date').textContent =
-    new Date().toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
-  renderAll();
-}
-
-// Check existing session on page load
-(async () => {
-  try {
-    const res = await fetch('/api/auth/check');
-    const { authenticated } = await res.json();
-    if (authenticated) {
-      await loadData();
-      showApp();
-    }
-  } catch {
-    // Network error — stay on login screen
-  }
-})();
-
-// ═══ NAVIGATION ═══════════════════════════════════
-document.querySelectorAll('.nav-item[data-tab]').forEach(btn => {
-  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-});
-
-function switchTab(tabId) {
-  if (window.innerWidth <= 768) closeSidebar();
-  document.querySelectorAll('.nav-item[data-tab]').forEach(b =>
-    b.classList.toggle('nav-item--active', b.dataset.tab === tabId));
-  document.querySelectorAll('.tab-panel').forEach(p =>
-    p.classList.toggle('tab-panel--active', p.id === `tab-${tabId}`));
-  const m = TAB_META[tabId];
-  if (m) {
-    document.getElementById('topbar-title').textContent = m.title;
-    document.getElementById('topbar-meta').textContent  = m.meta;
-  }
-  if (tabId === 'kunden')      renderKunden();
-  if (tabId === 'demos')       renderDemos();
-  if (tabId === 'nachrichten') renderNachrichten();
-}
-
-// ═══ SIDEBAR MOBILE ═══════════════════════════════
-function openSidebar()  { document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebar-overlay').classList.add('visible'); }
-function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('visible'); }
-document.getElementById('topbar-burger').addEventListener('click', openSidebar);
-document.getElementById('sidebar-overlay').addEventListener('click', closeSidebar);
-
-// ═══ RENDER ALL ═══════════════════════════════════
-function renderAll() {
-  renderStats();
-  renderKunden();
-  renderDemos();
-  renderNachrichten();
-  updateBadges();
-}
-
-// ═══ STATS / DASHBOARD ════════════════════════════
-function renderStats() {
-  const aktive = KUNDEN.filter(k => k.status === 'aktiv' || k.status === 'trial').length;
-  const basis   = KUNDEN.filter(k => k.paket === 'BASIS'    && (k.status === 'aktiv' || k.status === 'trial')).length;
-  const std     = KUNDEN.filter(k => k.paket === 'STANDARD' && (k.status === 'aktiv' || k.status === 'trial')).length;
-  const prem    = KUNDEN.filter(k => k.paket === 'PREMIUM'  && (k.status === 'aktiv' || k.status === 'trial')).length;
-  const mrr     = basis * 99 + std * 129 + prem * 149;
-  const demoN   = DEMOS.filter(d => d.status === 'neu').length;
-  const nachN   = NACHRICHTEN.filter(n => n.status === 'neu').length;
-
-  document.getElementById('dash-kunden').textContent      = aktive;
-  document.getElementById('dash-mrr').textContent         = `${mrr} €`;
-  document.getElementById('dash-demos').textContent       = DEMOS.length;
-  document.getElementById('dash-nachrichten').textContent = nachN;
-  document.getElementById('dash-basis-count').textContent = basis;
-  document.getElementById('dash-std-count').textContent   = std;
-  document.getElementById('dash-prem-count').textContent  = prem;
-
-  renderBarChart();
-  renderPaketeChart(basis, std, prem);
-  renderRecentDemos();
-}
-
-function renderBarChart() {
-  const labels = ['Dez', 'Jan', 'Feb', 'Mär', 'Apr', 'Mai'];
-  const data   = [1, 1, 1, 1, 0, 1]; // mock
-  const max    = Math.max(...data, 1);
-  const today  = new Date().toLocaleString('de-DE', { month: 'short' });
-  document.getElementById('bar-chart').innerHTML = labels.map((l, i) => {
-    const isNow = l === today.slice(0,3);
-    return `
-      <div class="bar-group">
-        <div class="bar-count">${data[i] || ''}</div>
-        <div class="bar-wrap">
-          <div class="bar-fill${isNow ? ' bar-fill--green' : ''}" style="height:${Math.round(data[i]/max*100)}%"></div>
-        </div>
-        <div class="bar-label" style="${isNow ? 'color:var(--green);' : ''}">${l}</div>
-      </div>`;
-  }).join('');
-}
-
-function renderPaketeChart(basis, std, prem) {
-  const el = document.getElementById('chart-pakete');
-  const total = basis + std + prem || 1;
-  const rows = [
-    { label: 'BASIS',    count: basis, color: 'var(--white-dim)' },
-    { label: 'STANDARD', count: std,   color: 'var(--beige)' },
-    { label: 'PREMIUM',  count: prem,  color: 'var(--green)' },
-  ];
-  el.innerHTML = `<div class="ratio-chart">${rows.map(r => {
-    const pct = ((r.count / total) * 100).toFixed(1);
-    return `
-      <div class="ratio-row">
-        <div class="ratio-label"><span class="ratio-dot" style="background:${r.color}"></span>${r.label}</div>
-        <div class="ratio-bar-wrap"><div class="ratio-bar-fill" style="width:${pct}%;background:${r.color}"></div></div>
-        <div class="ratio-num">${r.count}</div>
-        <div class="ratio-pct">${pct}%</div>
-      </div>`;
-  }).join('')}</div>`;
-}
-
-function renderRecentDemos() {
-  const el = document.getElementById('recent-demos-list');
-  const recent = [...DEMOS].sort((a,b) => b.eingegangen.localeCompare(a.eingegangen)).slice(0, 5);
-  if (!recent.length) {
-    el.innerHTML = '<p style="text-align:center;color:var(--white-dim);font-size:0.82rem;padding:1.25rem;">Keine Demo-Anfragen vorhanden.</p>';
-    return;
-  }
-  el.innerHTML = recent.map(d => `
-    <div style="display:flex;align-items:center;gap:1rem;padding:0.75rem 1.5rem;border-bottom:1px solid var(--border-sub);">
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:0.88rem;font-weight:500;color:var(--white);">${esc(d.name)} — <span style="color:var(--beige);">${esc(d.firma)}</span></div>
-        <div style="font-size:0.72rem;color:var(--white-dim);margin-top:0.1rem;">${esc(d.branche)} · ${esc(d.telefon)}</div>
-      </div>
-      <span class="badge badge--${d.status}">${d.status}</span>
-      <span style="font-size:0.7rem;color:var(--white-dim);">${formatDate(d.eingegangen)}</span>
-    </div>`).join('');
-}
-
-// ═══ KUNDEN ═══════════════════════════════════════
-function renderKunden() {
-  const listEl = document.getElementById('kunden-list');
-  const search = document.getElementById('filter-k-search')?.value.toLowerCase() || '';
-  const paket  = document.getElementById('filter-paket')?.value || '';
-  const status = document.getElementById('filter-k-status')?.value || '';
-
-  let list = KUNDEN.filter(k =>
-    (!search || k.name.toLowerCase().includes(search) || (k.email||'').toLowerCase().includes(search)) &&
-    (!paket  || k.paket === paket) &&
-    (!status || k.status === status)
-  );
-
-  if (!list.length) {
-    listEl.innerHTML = '<p style="text-align:center;color:var(--white-dim);font-size:0.82rem;padding:2rem;">Keine Kunden gefunden.</p>';
-    return;
-  }
-
-  listEl.innerHTML = `
-    <!-- Header-Zeile -->
-    <div class="kunde-row" style="padding:0.6rem 1.5rem;border-bottom:1px solid var(--border);background:var(--surface-2);">
-      <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--white-dim);">Unternehmen</div>
-      <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--white-dim);">Branche</div>
-      <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--white-dim);">Paket</div>
-      <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--white-dim);">Status</div>
-      <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--white-dim);">Seit</div>
-      <div></div>
-    </div>
-    ${list.map(k => `
-    <div class="kunde-row">
-      <div>
-        <div class="kunde-row__name">${esc(k.name)}</div>
-        <div class="kunde-row__meta">${esc(k.email || '—')}</div>
-      </div>
-      <div style="font-size:0.82rem;color:var(--white-dim);">${esc(k.branche || '—')}</div>
-      <span class="badge badge--${k.paket.toLowerCase()}">${esc(k.paket)}</span>
-      <span class="badge badge--${k.status}">${statusLabel(k.status)}</span>
-      <div style="font-size:0.78rem;color:var(--white-dim);">${formatDate(k.since)}</div>
-      <div style="display:flex;gap:0.3rem;">
-        <button class="btn btn-ghost btn-sm" onclick="toggleKundeStatus('${k.id}')" title="Status wechseln">⇄</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteKunde('${k.id}')">—</button>
-      </div>
-    </div>`).join('')}`;
-}
-
-document.getElementById('filter-paket')?.addEventListener('change', renderKunden);
-document.getElementById('filter-k-status')?.addEventListener('change', renderKunden);
-let _ksTimer;
-document.getElementById('filter-k-search')?.addEventListener('input', () => { clearTimeout(_ksTimer); _ksTimer = setTimeout(renderKunden, 300); });
-
-function toggleNewKunde() {
-  const f = document.getElementById('new-kunde-form');
-  const a = document.getElementById('new-kunde-arrow');
-  const open = f.style.display === 'none';
-  f.style.display = open ? 'block' : 'none';
-  a.textContent   = open ? '▾' : '▸';
-}
-
-async function addKunde() {
-  const name    = document.getElementById('nk-name').value.trim();
-  const branche = document.getElementById('nk-branche').value;
-  const paket   = document.getElementById('nk-paket').value;
-  const email   = document.getElementById('nk-email').value.trim();
-
-  if (!name) { toast('Bitte Unternehmensname eingeben.', 'error'); return; }
-
-  const res = await fetch('/api/kunden', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, branche, paket, email }),
-  });
-
-  if (res.ok) {
-    const kunde = await res.json();
-    KUNDEN.push(kunde);
-    toast(`Kunde "${name}" angelegt.`, 'success');
-    toggleNewKunde();
-    renderAll();
-    document.getElementById('nk-name').value  = '';
-    document.getElementById('nk-email').value = '';
-  } else {
-    toast('Fehler beim Anlegen des Kunden.', 'error');
-  }
-}
-
-async function toggleKundeStatus(id) {
-  const k = KUNDEN.find(x => x.id === id);
-  if (!k) return;
-  const next = { aktiv: 'trial', trial: 'inaktiv', inaktiv: 'aktiv' };
-  const newStatus = next[k.status] || 'aktiv';
-
-  const res = await fetch(`/api/kunden/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status: newStatus }),
-  });
-
-  if (res.ok) {
-    k.status = newStatus;
-    renderAll();
-    toast(`Status geändert: ${statusLabel(newStatus)}`, 'info');
-  } else {
-    toast('Fehler beim Statuswechsel.', 'error');
-  }
-}
-
-async function deleteKunde(id) {
-  if (!confirm('Kunden wirklich entfernen?')) return;
-
-  const res = await fetch(`/api/kunden/${id}`, { method: 'DELETE' });
-  if (res.ok) {
-    KUNDEN = KUNDEN.filter(k => k.id !== id);
-    renderAll();
-    toast('Kunde entfernt.', 'success');
-  } else {
-    toast('Fehler beim Entfernen.', 'error');
-  }
-}
-
-// ═══ DEMOS ════════════════════════════════════════
-function renderDemos() {
-  const el = document.getElementById('demos-list');
-  const sf = document.getElementById('filter-d-status')?.value || '';
-  const list = DEMOS.filter(d => !sf || d.status === sf);
-
-  if (!list.length) {
-    el.innerHTML = '<p style="text-align:center;color:var(--white-dim);font-size:0.82rem;padding:2rem;">Keine Demo-Anfragen gefunden.</p>';
-    return;
-  }
-
-  el.innerHTML = list.map(d => {
-    const statusText = { neu: 'Neu', kontaktiert: 'Kontaktiert', demo_gesendet: 'Demo gesendet', abgesagt: 'Abgesagt' }[d.status] || d.status;
-    const quizTags = d.features && d.features.length
-      ? d.features.map(f => `<span style="display:inline-block;padding:0.15rem 0.5rem;background:var(--white-sub);border:1px solid var(--border-sub);border-radius:4px;font-size:0.68rem;color:var(--white-dim);">${esc(f)}</span>`).join(' ')
-      : '';
-    return `
-    <div class="demo-card">
-      <div class="demo-card__info" style="flex:1;min-width:0;">
-        <div class="demo-card__name">${esc(d.name)}</div>
-        <div class="demo-card__firma">${esc(d.firma)}</div>
-        <div class="demo-card__meta">
-          ${esc(d.branche)} · <a href="mailto:${esc(d.email)}" style="color:var(--beige);">${esc(d.email)}</a> · ${esc(d.telefon)}<br>
-          Eingegangen: ${formatDate(d.eingegangen)}
-        </div>
-        ${d.stil ? `<div style="font-size:0.74rem;color:var(--white-dim);margin-top:0.4rem;">Stil: <span style="color:var(--beige);">${esc(d.stil)}</span></div>` : ''}
-        ${quizTags ? `<div style="margin-top:0.4rem;display:flex;flex-wrap:wrap;gap:0.3rem;">${quizTags}</div>` : ''}
-        ${d.statusWebsite ? `<div style="font-size:0.74rem;color:var(--white-dim);margin-top:0.3rem;">Website: ${esc(d.statusWebsite)}</div>` : ''}
-      </div>
-      <div class="demo-card__actions">
-        <span class="badge badge--${d.status}">${statusText}</span>
-        ${d.status === 'neu' ? `<button class="btn btn-success btn-sm" onclick="setDemoStatus('${d.id}','kontaktiert')">Kontaktiert</button>` : ''}
-        ${d.status === 'kontaktiert' ? `<button class="btn btn-success btn-sm" onclick="setDemoStatus('${d.id}','demo_gesendet')">Demo gesendet</button>` : ''}
-        ${d.status !== 'abgesagt' ? `<button class="btn btn-ghost btn-sm" onclick="setDemoStatus('${d.id}','abgesagt')">Absagen</button>` : ''}
-        <button class="btn btn-danger btn-sm" onclick="deleteDemo('${d.id}')">Löschen</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-document.getElementById('filter-d-status')?.addEventListener('change', renderDemos);
-
-async function setDemoStatus(id, status) {
-  const res = await fetch(`/api/demos/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status }),
-  });
-  if (res.ok) {
-    const d = DEMOS.find(x => x.id === id);
-    if (d) d.status = status;
-    renderAll();
-    toast('Demo-Status aktualisiert.', 'success');
-  } else {
-    toast('Fehler beim Aktualisieren.', 'error');
-  }
-}
-
-async function deleteDemo(id) {
-  if (!confirm('Anfrage löschen?')) return;
-  const res = await fetch(`/api/demos/${id}`, { method: 'DELETE' });
-  if (res.ok) {
-    DEMOS = DEMOS.filter(d => d.id !== id);
-    renderAll();
-    toast('Anfrage gelöscht.', 'success');
-  } else {
-    toast('Fehler beim Löschen.', 'error');
-  }
-}
-
-// ═══ NACHRICHTEN ══════════════════════════════════
-function renderNachrichten() {
-  const el = document.getElementById('nachrichten-list');
-  const sf = document.getElementById('filter-n-status')?.value || '';
-  const list = NACHRICHTEN.filter(n => !sf || n.status === sf);
-
-  if (!list.length) {
-    el.innerHTML = '<p style="text-align:center;color:var(--white-dim);font-size:0.82rem;padding:2rem;">Keine Nachrichten gefunden.</p>';
-    return;
-  }
-
-  el.innerHTML = list.map(n => `
-    <div class="msg-card ${n.status === 'neu' ? 'msg-card--unread' : ''}">
-      <div class="msg-card__info" style="flex:1;">
-        <div class="msg-card__name">${esc(n.name)} — <a href="mailto:${esc(n.email)}" style="color:var(--beige);font-size:0.82rem;">${esc(n.email)}</a></div>
-        <div class="msg-card__betreff">${esc(n.betreff)}</div>
-        ${n.text ? `<div style="font-size:0.76rem;color:var(--white-dim);margin-top:0.3rem;">${esc(n.text.slice(0,100))}${n.text.length > 100 ? '…' : ''}</div>` : ''}
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.5rem;flex-shrink:0;">
-        <span style="font-size:0.7rem;color:var(--white-dim);">${formatDate(n.eingegangen)}</span>
-        <span class="badge badge--${n.status}">${n.status === 'neu' ? 'Neu' : 'Gelesen'}</span>
-        ${n.status === 'neu' ? `<button class="btn btn-ghost btn-sm" onclick="setNachrichtStatus('${n.id}','gelesen')">Als gelesen markieren</button>` : ''}
-        <button class="btn btn-danger btn-sm" onclick="deleteNachricht('${n.id}')">Löschen</button>
-      </div>
-    </div>`).join('');
-}
-
-document.getElementById('filter-n-status')?.addEventListener('change', renderNachrichten);
-
-async function setNachrichtStatus(id, status) {
-  const res = await fetch(`/api/nachrichten/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status }),
-  });
-  if (res.ok) {
-    const n = NACHRICHTEN.find(x => x.id === id);
-    if (n) n.status = status;
-    renderAll();
-  } else {
-    toast('Fehler beim Aktualisieren.', 'error');
-  }
-}
-
-async function deleteNachricht(id) {
-  if (!confirm('Nachricht löschen?')) return;
-  const res = await fetch(`/api/nachrichten/${id}`, { method: 'DELETE' });
-  if (res.ok) {
-    NACHRICHTEN = NACHRICHTEN.filter(n => n.id !== id);
-    renderAll();
-    toast('Nachricht gelöscht.', 'success');
-  } else {
-    toast('Fehler beim Löschen.', 'error');
-  }
-}
-
-// ═══ BADGES ═══════════════════════════════════════
-function updateBadges() {
-  document.getElementById('badge-kunden').textContent      = KUNDEN.filter(k => k.status === 'aktiv' || k.status === 'trial').length;
-  document.getElementById('badge-demos').textContent       = DEMOS.filter(d => d.status === 'neu').length;
-  document.getElementById('badge-nachrichten').textContent = NACHRICHTEN.filter(n => n.status === 'neu').length;
-}
-
-// ═══ UTILS ════════════════════════════════════════
-function esc(str) {
-  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function formatDate(iso) {
-  if (!iso) return '—';
-  const [y, m, d] = iso.split('-');
-  return `${d}.${m}.${y}`;
-}
-
-function statusLabel(s) {
-  return { aktiv: 'Aktiv', trial: 'Trial', inaktiv: 'Inaktiv' }[s] || s;
-}
-
-function toast(message, type = 'info', duration = 3500) {
-  const c  = document.getElementById('toast-container');
-  const el = document.createElement('div');
-  el.className   = `toast toast--${type}`;
-  el.textContent = message;
-  c.appendChild(el);
-  setTimeout(() => {
-    el.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-    el.style.opacity    = '0';
-    el.style.transform  = 'translateX(12px)';
-    setTimeout(() => el.remove(), 320);
-  }, duration);
-}
-</script>
 </body>
 </html>

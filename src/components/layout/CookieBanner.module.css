@@ -20,14 +20,15 @@
   max-width: var(--max-w);
   margin-inline: auto;
   display: flex;
-  align-items: flex-end;
-  gap: 1.5rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 1rem;
 }
 
+/* ── Text ── */
 .text {
-  flex: 1;
-  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
 }
 
 .title {
@@ -35,7 +36,6 @@
   font-size: 1rem;
   font-weight: 600;
   color: var(--text);
-  margin-bottom: 0.35rem;
 }
 
 .desc {
@@ -45,53 +45,151 @@
   max-width: none;
 }
 
-.desc a {
+.descLink {
   color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
+/* ── Categories (expanded) ── */
+.categories {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  animation: expandIn 0.22s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes expandIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.category {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--line-sub);
+}
+
+.category:last-child {
+  border-bottom: none;
+}
+
+.catLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+}
+
+.catName {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.catDesc {
+  font-size: 0.74rem;
+  color: var(--text-dim);
+  line-height: 1.45;
+}
+
+/* ── Toggle Pill ── */
+.pill {
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--line);
+  border: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.pill:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.pillOn {
+  background: var(--accent);
+}
+
+.pillLocked {
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+.pillThumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.18s ease;
+  flex-shrink: 0;
+}
+
+.pillOn .pillThumb {
+  transform: translateX(16px);
+}
+
+/* ── Actions ── */
 .actions {
   display: flex;
   gap: 0.6rem;
   flex-wrap: wrap;
   align-items: center;
-  flex-shrink: 0;
 }
 
-/* Alle drei Buttons gleich auffällig (TTDSG) */
-.btnAll {
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-  color: var(--black);
+/* TTDSG: gleiche visuelle Gewichtung für Accept und Reject */
+.btnAll,
+.btnNec {
+  font-family: var(--font-body);
   font-weight: 600;
   padding: 0.65rem 1.25rem;
   border-radius: var(--radius);
   font-size: 0.84rem;
   cursor: pointer;
-  border: none;
   transition: all var(--transition);
+}
+
+.btnAll {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+  color: var(--black);
+  border: 1.5px solid transparent;
 }
 
 .btnAll:hover { box-shadow: var(--shadow-accent); transform: translateY(-1px); }
 
 .btnNec {
-  background: var(--overlay-hover);
-  color: var(--text-dim);
-  border: 1px solid var(--line);
-  font-weight: 400;
-  padding: 0.65rem 1.25rem;
-  border-radius: var(--radius);
-  font-size: 0.84rem;
-  cursor: pointer;
-  transition: all var(--transition);
+  background: transparent;
+  color: var(--accent);
+  border: 1.5px solid var(--accent);
 }
 
-.btnNec:hover { border-color: var(--text-dim); color: var(--text); }
+.btnNec:hover { background: var(--accent-muted); }
+
+.btnAll:focus-visible,
+.btnNec:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
 
 .btnSettings {
   background: transparent;
   color: var(--text-sub);
   border: none;
+  font-family: var(--font-body);
   font-size: 0.82rem;
   cursor: pointer;
   padding: 0.65rem 0.5rem;
@@ -101,9 +199,9 @@
 }
 
 .btnSettings:hover { color: var(--text-dim); }
+.btnSettings:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
 
 @media (max-width: 600px) {
-  .inner { flex-direction: column; align-items: stretch; }
-  .actions { flex-direction: column; }
+  .actions { flex-direction: column; align-items: stretch; }
   .btnAll, .btnNec { text-align: center; }
 }

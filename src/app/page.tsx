@@ -4,6 +4,7 @@ import { PLANS } from '@/data/pricing';
 import { BRANCHEN } from '@/data/branchen';
 import { buildMetadata } from '@/lib/seo';
 import { HeroBlobWidget } from '@/components/ui/HeroBlobWidget';
+import { HeroTypewriter } from '@/components/ui/HeroTypewriter';
 import s from './page.module.css';
 
 export const metadata: Metadata = buildMetadata({
@@ -54,11 +55,7 @@ export default function HomePage() {
                 Für lokale Unternehmen in Deutschland
               </div>
 
-              <h1 className={s.heroH1} id="hero-h1">
-                Ihre Website.<br />
-                Ihr <span className={s.heroAccent}>Buchungssystem.</span><br />
-                Ihr Admin-Panel.
-              </h1>
+              <HeroTypewriter className={s.heroH1} accentClass={s.heroAccent} />
 
               <p className={s.heroSub}>
                 WebCore gibt Ihrem Salon, Ihrer Praxis oder Werkstatt eine professionelle

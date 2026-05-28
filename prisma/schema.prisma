@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Kunde {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String    @db.VarChar(120)
+  branche   String    @default("") @db.VarChar(120)
+  paket     String    @default("BASIS") @db.VarChar(20)
+  status    String    @default("trial") @db.VarChar(20)
+  email     String    @default("") @db.VarChar(120)
+  since     DateTime  @default(now()) @db.Date
+  deletedAt DateTime?
+
+  @@index([status])
+  @@index([deletedAt])
+  @@map("kunden")
+}
+
+model Demo {
+  id            String    @id @default(uuid()) @db.Uuid
+  name          String    @db.VarChar(120)
+  firma         String    @db.VarChar(120)
+  email         String    @db.VarChar(120)
+  telefon       String    @db.VarChar(120)
+  branche       String    @db.VarChar(300)
+  eingegangen   DateTime  @default(now()) @db.Date
+  status        String    @default("neu") @db.VarChar(20)
+  stil          String?   @db.VarChar(300)
+  features      String[]
+  statusWebsite String?   @db.VarChar(300)
+  deletedAt     DateTime?
+
+  @@index([email])
+  @@index([eingegangen])
+  @@index([deletedAt])
+  @@map("demos")
+}
+
+model Nachricht {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String    @db.VarChar(120)
+  email       String    @db.VarChar(120)
+  betreff     String    @db.VarChar(120)
+  text        String    @db.VarChar(1000)
+  eingegangen DateTime  @default(now()) @db.Date
+  status      String    @default("neu") @db.VarChar(20)
+  deletedAt   DateTime?
+
+  @@index([deletedAt])
+  @@map("nachrichten")
+}

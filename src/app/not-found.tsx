@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { TypewriterH1 } from '@/components/ui/TypewriterH1';
 
 export const metadata: Metadata = {
   title: 'Seite nicht gefunden | WebCore',
@@ -13,9 +14,9 @@ export default function NotFound() {
         <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(4rem, 12vw, 8rem)', fontWeight: 700, color: 'var(--accent)', lineHeight: 1, marginBottom: '1rem' }}>
           404
         </div>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 600, letterSpacing: '-0.02em', marginBottom: '0.75rem' }}>
+        <TypewriterH1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 600, letterSpacing: '-0.02em', marginBottom: '0.75rem' }}>
           Diese Seite gibt es nicht
-        </h1>
+        </TypewriterH1>
         <p style={{ color: 'var(--text-dim)', fontSize: '1rem', lineHeight: 1.65, marginBottom: '2rem' }}>
           Die gesuchte Seite wurde möglicherweise verschoben oder gelöscht.
         </p>

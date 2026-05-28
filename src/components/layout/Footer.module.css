@@ -76,7 +76,13 @@
   line-height: 1.3;
 }
 
-.colLink:hover { color: var(--text); }
+.colLink:hover {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
 
 /* Bottom bar */
 .bottom {
@@ -109,7 +115,13 @@
   transition: color var(--transition);
 }
 
-.bottomLink:hover { color: var(--text-dim); }
+.bottomLink:hover {
+  color: var(--text-dim);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
 
 .cookieBtn {
   font-size: 0.76rem;

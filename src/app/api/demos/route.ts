@@ -1,8 +1,14 @@
 import { NextResponse } from 'next/server';
 import { isAuthed } from '@/lib/session';
 import { db } from '@/lib/db';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: Request) {
   if (!isAuthed(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  return NextResponse.json(db.demos.list());
+  try {
+    return NextResponse.json(await db.demos.list());
+  } catch (err) {
+    logger.error('[demos] list error', { err: err instanceof Error ? err.message : String(err) });
+    return NextResponse.json({ error: 'Interner Fehler' }, { status: 500 });
+  }
 }

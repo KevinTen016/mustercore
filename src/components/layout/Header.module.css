@@ -12,7 +12,7 @@
 
 [data-theme="light"] .header {
   background: rgba(255, 255, 255, 0.88);
-  border-bottom-color: var(--line);
+  border-bottom-color: rgba(15, 15, 30, 0.07);
 }
 
 .header.scrolled {
@@ -80,8 +80,21 @@
   text-decoration: none;
 }
 
-.navLink:hover { color: var(--text); background: var(--overlay-hover); }
-.navLink.active { color: var(--text); }
+.navLink:hover {
+  color: var(--text);
+  background: var(--overlay-hover);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+.navLink.active {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
 .navLinkCaret { transition: transform var(--transition); }
 .navLink:hover .navLinkCaret { transform: rotate(180deg); }
 
@@ -159,14 +172,26 @@
   height: 36px;
   border-radius: var(--radius);
   background: none;
-  border: 1px solid var(--line);
+  border: none;
   color: var(--text-dim);
   cursor: pointer;
-  transition: all var(--transition);
-  font-size: 1rem;
+  transition: background var(--transition), color var(--transition);
+  padding: 0;
 }
 
-.themeBtn:hover { border-color: var(--text-dim); color: var(--text); }
+.themeBtn:hover {
+  background: var(--overlay-hover);
+  color: var(--text);
+}
+
+.themeBtn svg {
+  display: block;
+  transition: transform var(--transition);
+}
+
+.themeBtn:hover svg {
+  transform: scale(1.18) rotate(8deg);
+}
 
 /* Burger */
 .burger {
@@ -243,7 +268,14 @@
   transition: all var(--transition);
 }
 
-.drawerLink:hover { background: var(--overlay-hover); color: var(--text); }
+.drawerLink:hover {
+  background: var(--overlay-hover);
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
 
 .drawerDivider {
   border: none;

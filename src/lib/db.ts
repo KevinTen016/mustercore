@@ -1,168 +1,163 @@
-import fs from 'fs';
-import path from 'path';
-import crypto from 'crypto';
+import { PrismaClient, Prisma } from '@prisma/client';
 
-const DB_PATH = process.env.DB_PATH ?? path.join(process.cwd(), 'data', 'db.json');
+// Singleton: один клиент на весь процесс; в dev hot-reload не плодит соединения
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+const prisma = globalForPrisma.prisma ?? new PrismaClient();
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
-export interface Kunde {
-  id: string;
-  name: string;
-  branche: string;
-  paket: 'BASIS' | 'STANDARD' | 'PREMIUM';
-  status: 'aktiv' | 'trial' | 'inaktiv';
-  email: string;
-  since: string;
-}
+// ── DTOs — то, что видит API-клиент; внутренние поля (deletedAt) не утекают ──
 
-export interface Demo {
-  id: string;
-  name: string;
-  firma: string;
-  email: string;
-  telefon: string;
-  branche: string;
-  eingegangen: string;
-  status: 'neu' | 'kontaktiert' | 'demo_gesendet' | 'abgesagt';
-  // Quiz fields — optional for backward compat with seed data
-  stil?: string;
-  features?: string[];
-  statusWebsite?: string;
-}
-
-export interface Nachricht {
-  id: string;
-  name: string;
-  email: string;
-  betreff: string;
-  text: string;
-  eingegangen: string;
-  status: 'neu' | 'gelesen';
-}
-
-interface DbData {
-  kunden: Kunde[];
-  demos: Demo[];
-  nachrichten: Nachricht[];
-}
-
-const SEED: DbData = {
-  kunden: [
-    { id: '1', name: 'Salon Harmonie',     branche: 'Friseursalon',   paket: 'STANDARD', status: 'aktiv',  email: 'info@salon-harmonie.de',   since: '2024-09-01' },
-    { id: '2', name: 'Dr. med. Schmidt',   branche: 'Arztpraxis',     paket: 'PREMIUM',  status: 'aktiv',  email: 'praxis@dr-schmidt.de',     since: '2024-11-15' },
-    { id: '3', name: 'AutoService Müller', branche: 'Autowerkstatt',  paket: 'BASIS',    status: 'aktiv',  email: 'kontakt@autoservice.de',   since: '2025-01-10' },
-    { id: '4', name: 'Physio Aktiv GbR',   branche: 'Physiotherapie', paket: 'STANDARD', status: 'trial',  email: 'info@physio-aktiv.de',     since: '2025-04-01' },
-    { id: '5', name: 'FitStyle Studio',    branche: 'Fitness / Yoga', paket: 'BASIS',    status: 'aktiv',  email: 'hello@fitstyle.de',        since: '2025-03-20' },
-  ],
-  demos: [
-    { id: '1', name: 'Markus Weber',   firma: 'Friseursalon Weber',   email: 'weber@gmail.com',      telefon: '+49 151 12345678', branche: 'Friseursalon',    eingegangen: '2025-05-20', status: 'neu' },
-    { id: '2', name: 'Lisa Hoffmann',  firma: 'Yoga Studio Balance',  email: 'lisa@yogabalance.de',  telefon: '+49 176 98765432', branche: 'Fitness / Yoga',  eingegangen: '2025-05-18', status: 'kontaktiert' },
-    { id: '3', name: 'Bernd Schuster', firma: 'Tattoo Collective BS', email: 'info@tattoo-bs.de',    telefon: '+49 162 44556677', branche: 'Tattoostudio',    eingegangen: '2025-05-16', status: 'neu' },
-  ],
-  nachrichten: [
-    { id: '1', name: 'Thomas B.', email: 'thomas@example.de', betreff: 'Frage zur DSGVO-Konformität',   text: 'Hallo, ich hätte eine Frage zum Datenschutz…', eingegangen: '2025-05-21', status: 'neu' },
-    { id: '2', name: 'Anna K.',   email: 'anna@example.de',   betreff: 'Interesse an PREMIUM-Paket',    text: 'Wir sind ein größeres Studio und würden…',   eingegangen: '2025-05-19', status: 'gelesen' },
-    { id: '3', name: 'Jonas M.',  email: 'jonas@example.de',  betreff: 'Technische Frage zum Kalender', text: 'Kann man mehrere Standorte verwalten?',       eingegangen: '2025-05-15', status: 'gelesen' },
-  ],
+export type KundeDTO = {
+  id: string; name: string; branche: string;
+  paket: string; status: string; email: string; since: string;
 };
 
-function read(): DbData {
-  try {
-    return JSON.parse(fs.readFileSync(DB_PATH, 'utf-8')) as DbData;
-  } catch {
-    return structuredClone(SEED);
-  }
+export type DemoDTO = {
+  id: string; name: string; firma: string; email: string;
+  telefon: string; branche: string; eingegangen: string;
+  status: string; stil: string | null;
+  features: string[]; statusWebsite: string | null;
+};
+
+export type NachrichtDTO = {
+  id: string; name: string; email: string; betreff: string;
+  text: string; eingegangen: string; status: string;
+};
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function toDateStr(d: Date | string): string {
+  if (typeof d === 'string') return d.slice(0, 10);
+  return d.toISOString().slice(0, 10);
 }
 
-function write(data: DbData): void {
-  const dir = path.dirname(DB_PATH);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  const tmp = DB_PATH + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify(data, null, 2), 'utf-8');
-  fs.renameSync(tmp, DB_PATH);
+function toKundeDTO(k: { id: string; name: string; branche: string; paket: string; status: string; email: string; since: Date | string }): KundeDTO {
+  return { id: k.id, name: k.name, branche: k.branche, paket: k.paket, status: k.status, email: k.email, since: toDateStr(k.since) };
 }
 
-function newId(): string {
-  return crypto.randomUUID();
+function toDemoDTO(d: { id: string; name: string; firma: string; email: string; telefon: string; branche: string; eingegangen: Date | string; status: string; stil: string | null; features: string[]; statusWebsite: string | null }): DemoDTO {
+  return { id: d.id, name: d.name, firma: d.firma, email: d.email, telefon: d.telefon, branche: d.branche, eingegangen: toDateStr(d.eingegangen), status: d.status, stil: d.stil, features: d.features, statusWebsite: d.statusWebsite };
 }
+
+function toNachrichtDTO(n: { id: string; name: string; email: string; betreff: string; text: string; eingegangen: Date | string; status: string }): NachrichtDTO {
+  return { id: n.id, name: n.name, email: n.email, betreff: n.betreff, text: n.text, eingegangen: toDateStr(n.eingegangen), status: n.status };
+}
+
+function notFound(e: unknown): boolean {
+  return e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025';
+}
+
+// Soft-delete filter applied to all list/update/remove operations
+const LIVE = { deletedAt: null } as const;
+
+// ── Input types ───────────────────────────────────────────────────────────────
+
+type KundeCreate = { name: string; branche: string; paket: string; email: string; status: string; since: Date };
+type DemoCreate  = { name: string; firma: string; email: string; telefon: string; branche: string; eingegangen: Date; status: string; stil: string; features: string[]; statusWebsite: string };
+
+// ── Public API ────────────────────────────────────────────────────────────────
 
 export const db = {
+  async ping(): Promise<void> {
+    await prisma.$queryRaw`SELECT 1`;
+  },
+
   kunden: {
-    list(): Kunde[] {
-      return read().kunden;
+    async list(): Promise<KundeDTO[]> {
+      const rows = await prisma.kunde.findMany({ where: LIVE, orderBy: { since: 'desc' }, take: 500 });
+      return rows.map(toKundeDTO);
     },
-    add(input: Omit<Kunde, 'id'>): Kunde {
-      const data = read();
-      const item: Kunde = { id: newId(), ...input };
-      data.kunden.push(item);
-      write(data);
-      return item;
+    async add(input: KundeCreate): Promise<KundeDTO> {
+      const row = await prisma.kunde.create({ data: input });
+      return toKundeDTO(row);
     },
-    update(id: string, patch: Partial<Omit<Kunde, 'id'>>): Kunde | null {
-      const data = read();
-      const idx = data.kunden.findIndex(x => x.id === id);
-      if (idx === -1) return null;
-      data.kunden[idx] = { ...data.kunden[idx], ...patch };
-      write(data);
-      return data.kunden[idx];
+    async update(id: string, patch: Partial<{ status: string; name: string; email: string; branche: string; paket: string }>): Promise<KundeDTO | null> {
+      try {
+        const row = await prisma.kunde.update({ where: { id, ...LIVE }, data: patch });
+        return toKundeDTO(row);
+      } catch (e) {
+        if (notFound(e)) return null;
+        throw e;
+      }
     },
-    remove(id: string): boolean {
-      const data = read();
-      const before = data.kunden.length;
-      data.kunden = data.kunden.filter(x => x.id !== id);
-      if (data.kunden.length === before) return false;
-      write(data);
-      return true;
+    async remove(id: string): Promise<boolean> {
+      try {
+        await prisma.kunde.update({ where: { id, ...LIVE }, data: { deletedAt: new Date() } });
+        return true;
+      } catch (e) {
+        if (notFound(e)) return false;
+        throw e;
+      }
     },
   },
 
   demos: {
-    list(): Demo[] {
-      return read().demos;
+    async list(): Promise<DemoDTO[]> {
+      const rows = await prisma.demo.findMany({ where: LIVE, orderBy: { eingegangen: 'desc' }, take: 500 });
+      return rows.map(toDemoDTO);
     },
-    add(input: Omit<Demo, 'id'>): Demo {
-      const data = read();
-      const item: Demo = { id: newId(), ...input };
-      data.demos.push(item);
-      write(data);
-      return item;
+    async add(input: DemoCreate): Promise<DemoDTO> {
+      const row = await prisma.demo.create({ data: { ...input, features: input.features ?? [] } });
+      return toDemoDTO(row);
     },
-    update(id: string, patch: Partial<Omit<Demo, 'id'>>): Demo | null {
-      const data = read();
-      const idx = data.demos.findIndex(x => x.id === id);
-      if (idx === -1) return null;
-      data.demos[idx] = { ...data.demos[idx], ...patch };
-      write(data);
-      return data.demos[idx];
+    async update(id: string, patch: Partial<{ status: string }>): Promise<DemoDTO | null> {
+      try {
+        const row = await prisma.demo.update({ where: { id, ...LIVE }, data: patch });
+        return toDemoDTO(row);
+      } catch (e) {
+        if (notFound(e)) return null;
+        throw e;
+      }
     },
-    remove(id: string): boolean {
-      const data = read();
-      const before = data.demos.length;
-      data.demos = data.demos.filter(x => x.id !== id);
-      if (data.demos.length === before) return false;
-      write(data);
-      return true;
+    async remove(id: string): Promise<boolean> {
+      try {
+        await prisma.demo.update({ where: { id, ...LIVE }, data: { deletedAt: new Date() } });
+        return true;
+      } catch (e) {
+        if (notFound(e)) return false;
+        throw e;
+      }
+    },
+    async existsByEmailToday(email: string): Promise<boolean> {
+      // UTC date boundaries — consistent with how eingegangen is stored.
+      // Dedup applies regardless of deletedAt: prevents re-submit on same day
+      // even if admin removed the lead.
+      const start = new Date(); start.setUTCHours(0, 0, 0, 0);
+      const end   = new Date(); end.setUTCHours(23, 59, 59, 999);
+      const existing = await prisma.demo.findFirst({
+        where: { email, eingegangen: { gte: start, lte: end } },
+        select: { id: true },
+      });
+      return existing != null;
     },
   },
 
   nachrichten: {
-    list(): Nachricht[] {
-      return read().nachrichten;
+    async list(): Promise<NachrichtDTO[]> {
+      const rows = await prisma.nachricht.findMany({ where: LIVE, orderBy: { eingegangen: 'desc' }, take: 500 });
+      return rows.map(toNachrichtDTO);
     },
-    update(id: string, patch: Partial<Omit<Nachricht, 'id'>>): Nachricht | null {
-      const data = read();
-      const idx = data.nachrichten.findIndex(x => x.id === id);
-      if (idx === -1) return null;
-      data.nachrichten[idx] = { ...data.nachrichten[idx], ...patch };
-      write(data);
-      return data.nachrichten[idx];
+    async add(input: { name: string; email: string; betreff: string; text: string; eingegangen: Date; status: string }): Promise<NachrichtDTO> {
+      const row = await prisma.nachricht.create({ data: input });
+      return toNachrichtDTO(row);
     },
-    remove(id: string): boolean {
-      const data = read();
-      const before = data.nachrichten.length;
-      data.nachrichten = data.nachrichten.filter(x => x.id !== id);
-      if (data.nachrichten.length === before) return false;
-      write(data);
-      return true;
+    async update(id: string, patch: Partial<{ status: string }>): Promise<NachrichtDTO | null> {
+      try {
+        const row = await prisma.nachricht.update({ where: { id, ...LIVE }, data: patch });
+        return toNachrichtDTO(row);
+      } catch (e) {
+        if (notFound(e)) return null;
+        throw e;
+      }
+    },
+    async remove(id: string): Promise<boolean> {
+      try {
+        await prisma.nachricht.update({ where: { id, ...LIVE }, data: { deletedAt: new Date() } });
+        return true;
+      } catch (e) {
+        if (notFound(e)) return false;
+        throw e;
+      }
     },
   },
 };

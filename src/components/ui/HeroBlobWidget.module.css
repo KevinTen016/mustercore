@@ -1,146 +1,23 @@
 /* ────────────────────────────────────────────────
-   HERO BLOB WIDGET
+   HERO DOT GRID + ADMIN PANEL WIDGET
    ──────────────────────────────────────────────── */
 
 .container {
   position: relative;
   width: 100%;
   min-height: 340px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.clickable { cursor: pointer; }
-
 /* ═══════════════════════════════
-   BLOB (idle / exiting phases)
+   CANVAS
 ═══════════════════════════════ */
 
-.blobWrap {
+.canvas {
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  --mx: 0;
-  --my: 0;
-  transform: translate(calc(var(--mx) * 22px), calc(var(--my) * 16px));
-  transition: transform 0.5s ease;
-}
-
-.blobExit {
-  animation: exitSpin 0.55s cubic-bezier(0.6, 0, 1, 0.5) forwards;
-}
-
-@keyframes exitSpin {
-  0%   { opacity: 1; transform: scale(1)    rotate(0deg);   }
-  25%  {             transform: scale(1.1)  rotate(-15deg); }
-  100% { opacity: 0; transform: scale(0)    rotate(200deg); }
-}
-
-/* Dark glass shape — no green, just form */
-.blobShape {
-  position: absolute;
-  width: 64%;
-  aspect-ratio: 1;
-  background: linear-gradient(
-    140deg,
-    rgba(255, 255, 255, 0.05) 0%,
-    rgba(255, 255, 255, 0.01) 60%,
-    rgba(0, 0, 0, 0.15) 100%
-  );
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 32px 80px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(0, 0, 0, 0.25);
-  animation: morphA 11s ease-in-out infinite, spinCW 22s linear infinite;
-}
-
-/* Mouse-following gloss — makes it feel like real glass */
-.blobGloss {
-  position: absolute;
-  width: 64%;
-  aspect-ratio: 1;
-  background: radial-gradient(
-    circle at calc(50% + var(--mx, 0) * 40%) calc(50% + var(--my, 0) * 40%),
-    rgba(255, 255, 255, 0.10) 0%,
-    transparent 55%
-  );
-  animation: morphA 11s ease-in-out infinite, spinCW 22s linear infinite;
-  pointer-events: none;
-}
-
-/* Subtle outer ring */
-.blobRing {
-  position: absolute;
-  width: 84%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  animation: ringPulse 4.5s ease-in-out infinite;
-}
-
-@keyframes ringPulse {
-  0%, 100% { transform: scale(1);    opacity: 0.25; }
-  50%       { transform: scale(1.06); opacity: 0.55; }
-}
-
-/* Morph keyframes */
-@keyframes morphA {
-  0%   { border-radius: 62% 38% 34% 66% / 58% 36% 64% 42%; }
-  14%  { border-radius: 44% 56% 54% 46% / 44% 62% 38% 56%; }
-  28%  { border-radius: 56% 44% 66% 34% / 54% 42% 58% 46%; }
-  42%  { border-radius: 38% 62% 44% 56% / 64% 36% 60% 40%; }
-  57%  { border-radius: 66% 34% 50% 50% / 38% 66% 36% 64%; }
-  71%  { border-radius: 36% 64% 60% 40% / 58% 44% 54% 46%; }
-  85%  { border-radius: 52% 48% 38% 62% / 46% 54% 46% 54%; }
-  100% { border-radius: 62% 38% 34% 66% / 58% 36% 64% 42%; }
-}
-
-@keyframes spinCW { to { transform: rotate(360deg); } }
-
-/* ═══════════════════════════════
-   HINT
-═══════════════════════════════ */
-
-.hint {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.55rem;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.hintRipple {
+  width: 100%;
+  height: 100%;
   display: block;
-  width: 42px;
-  height: 42px;
-  border: 1.5px solid rgba(255, 255, 255, 0.18);
-  border-radius: 50%;
-  animation: ripple 2.4s ease-out infinite;
-}
-
-@keyframes ripple {
-  0%   { transform: scale(0.5); opacity: 1;   }
-  100% { transform: scale(2.2); opacity: 0; }
-}
-
-.hintLabel {
-  font-size: 0.62rem;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.35);
-  font-weight: 600;
-  animation: labelBlink 2.4s ease-in-out infinite;
-}
-
-@keyframes labelBlink {
-  0%, 100% { opacity: 0.35; }
-  50%       { opacity: 0.7;  }
 }
 
 /* ═══════════════════════════════
@@ -148,14 +25,16 @@
 ═══════════════════════════════ */
 
 .card {
-  width: 100%;
+  position: absolute;
+  inset: 0;
   background: var(--bg-card);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0, 237, 100, 0.06);
-  position: relative;
-  animation: cardPop 0.5s cubic-bezier(0.34, 1.5, 0.64, 1) both;
+  display: flex;
+  flex-direction: column;
+  animation: cardPop 0.28s ease both;
 }
 
 .card::before {
@@ -167,45 +46,42 @@
 }
 
 @keyframes cardPop {
-  from { opacity: 0; transform: scale(0.84); }
-  to   { opacity: 1; transform: scale(1);    }
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0);    }
 }
 
-/* ─── Browser chrome ─── */
+/* ── Browser chrome ── */
 .browserBar {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.55rem 0.85rem;
+  padding: 0.5rem 0.85rem;
   background: var(--bg-card-2);
   border-bottom: 1px solid var(--line-sub);
-}
-
-.bdot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
   flex-shrink: 0;
 }
 
+.bdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
 .burl {
   flex: 1;
-  font-size: 0.62rem;
+  font-size: 0.6rem;
   color: var(--text-sub);
   text-align: center;
   background: var(--bg);
   border: 1px solid var(--line-sub);
   border-radius: 999px;
-  padding: 0.15rem 0.6rem;
+  padding: 0.14rem 0.6rem;
 }
 
-/* ─── Admin layout ─── */
+/* ── Admin layout ── */
 .adminLayout {
   display: grid;
   grid-template-columns: 40px 1fr;
+  flex: 1;
+  overflow: hidden;
 }
 
-/* ─── Sidebar ─── */
 .adminSidebar {
   background: var(--bg);
   border-right: 1px solid var(--line-sub);
@@ -221,7 +97,7 @@
   font-size: 0.68rem;
   font-weight: 800;
   color: var(--accent);
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.55rem;
   letter-spacing: 0.04em;
 }
 
@@ -237,8 +113,8 @@
   font-size: 0.68rem;
   color: var(--text-sub);
   cursor: pointer;
-  transition: background 0.13s ease, color 0.13s ease, transform 0.13s ease;
   position: relative;
+  transition: background 0.12s, color 0.12s, transform 0.12s;
 }
 
 .navBtn:hover {
@@ -247,6 +123,7 @@
   transform: scale(1.1);
 }
 
+/* Active indicator bar on left */
 .navBtn::after {
   content: '';
   position: absolute;
@@ -254,10 +131,10 @@
   top: 50%;
   transform: translateY(-50%) scaleY(0);
   width: 2px;
-  height: 60%;
+  height: 55%;
   background: var(--accent);
   border-radius: 0 2px 2px 0;
-  transition: transform 0.13s ease;
+  transition: transform 0.12s;
 }
 
 .navActive {
@@ -265,23 +142,20 @@
   color: var(--accent) !important;
 }
 
-.navActive::after {
-  transform: translateY(-50%) scaleY(1);
-}
+.navActive::after { transform: translateY(-50%) scaleY(1); }
 
-/* ─── Admin main ─── */
+/* ── Admin main ── */
 .adminMain {
   padding: 0.75rem 0.9rem;
-  min-height: 155px;
+  overflow: hidden;
 }
 
-/* Tab entrance animation (triggered by key change) */
 .tabContent {
-  animation: tabIn 0.2s ease both;
+  animation: tabIn 0.18s ease both;
 }
 
 @keyframes tabIn {
-  from { opacity: 0; transform: translateX(6px); }
+  from { opacity: 0; transform: translateX(5px); }
   to   { opacity: 1; transform: translateX(0);   }
 }
 
@@ -289,7 +163,7 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 0.65rem;
+  margin-bottom: 0.6rem;
 }
 
 .adminTitle {
@@ -304,65 +178,59 @@
 .adminDate      { font-size: 0.6rem; color: var(--text-sub); }
 .adminDateGreen { font-size: 0.6rem; color: var(--accent);   }
 
-/* ─── Stats (tab 0) ─── */
+/* ── Stats (tab 0) ── */
 .stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.45rem;
-  margin-bottom: 0.65rem;
+  gap: 0.4rem;
+  margin-bottom: 0.6rem;
 }
 
 .stat {
   background: var(--bg-card-2);
   border-radius: var(--radius);
-  padding: 0.45rem 0.6rem;
+  padding: 0.42rem 0.55rem;
 }
 
-.statVal {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
+.statVal   { font-family: var(--font-display); font-size: 1rem; font-weight: 700; line-height: 1; }
 .colAccent { color: var(--accent); }
 .colGreen  { color: var(--green, #28c840); }
+.statLabel { font-size: 0.58rem; color: var(--text-sub); margin-top: 0.1rem; }
 
-.statLabel {
-  font-size: 0.58rem;
-  color: var(--text-sub);
-  margin-top: 0.12rem;
-}
-
-/* ─── Appointments (tab 0) ─── */
-.appointments {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
+/* ── Appointments (tab 0) ── */
+.appointments { display: flex; flex-direction: column; gap: 0.28rem; }
 
 .apptRow {
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.38rem 0.5rem;
+  padding: 0.36rem 0.5rem;
   background: var(--bg-card-2);
   border-radius: var(--radius);
-  animation: rowSlide 0.25s ease both;
-  animation-delay: calc(var(--ri) * 70ms + 80ms);
+  animation: rowSlide 0.22s ease both;
+  animation-delay: calc(var(--ri) * 65ms + 70ms);
+}
+
+.emptyHint {
+  font-size: 0.65rem;
+  color: var(--text-sub);
+  text-align: center;
+  padding: 0.75rem 0;
+  opacity: 0.6;
 }
 
 .apptDot  { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.apptTime { font-size: 0.63rem; color: var(--text-sub); min-width: 2.1rem; font-variant-numeric: tabular-nums; }
-.apptName { font-size: 0.7rem;  color: var(--text-dim); }
+.apptTime    { font-size: 0.62rem; color: var(--text-sub); min-width: 2rem; font-variant-numeric: tabular-nums; }
+.apptName    { font-size: 0.7rem;  color: var(--text-dim); }
+.apptService { font-size: 0.57rem; color: var(--text-sub); margin-left: auto; }
 
-/* ─── Bar chart (tab 1) ─── */
+/* ── Bar chart (tab 1) ── */
 .barChart {
   display: flex;
   align-items: flex-end;
-  gap: 0.28rem;
-  height: 62px;
-  margin-bottom: 0.65rem;
+  gap: 0.25rem;
+  height: 58px;
+  margin-bottom: 0.6rem;
 }
 
 .barCol {
@@ -370,7 +238,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.22rem;
+  gap: 0.2rem;
   height: 100%;
   justify-content: flex-end;
 }
@@ -380,8 +248,8 @@
   height: var(--h);
   background: var(--bg-card-2);
   border-radius: 3px 3px 0 0;
-  animation: barGrow 0.35s ease both;
-  animation-delay: calc(var(--bi) * 45ms + 60ms);
+  animation: barGrow 0.3s ease both;
+  animation-delay: calc(var(--bi) * 42ms + 50ms);
 }
 
 .barToday {
@@ -391,11 +259,11 @@
 }
 
 @keyframes barGrow {
-  from { height: 0; opacity: 0; }
-  to   { height: var(--h); opacity: 1; }
+  from { height: 0; }
+  to   { height: var(--h); }
 }
 
-.barDay { font-size: 0.52rem; color: var(--text-sub); }
+.barDay { font-size: 0.5rem; color: var(--text-sub); }
 
 .revRow {
   display: flex;
@@ -403,21 +271,21 @@
   align-items: center;
   background: var(--bg-card-2);
   border-radius: var(--radius);
-  padding: 0.45rem 0.6rem;
+  padding: 0.42rem 0.55rem;
 }
 
-.revLabel { font-size: 0.63rem; color: var(--text-dim); }
-.revVal   { font-family: var(--font-display); font-size: 0.9rem; font-weight: 700; color: var(--green, #28c840); }
+.revLabel { font-size: 0.62rem; color: var(--text-dim); }
+.revVal   { font-family: var(--font-display); font-size: 0.88rem; font-weight: 700; color: var(--green, #28c840); }
 
-/* ─── Client list (tab 2) ─── */
-.clientList { display: flex; flex-direction: column; gap: 0.35rem; }
+/* ── Clients (tab 2) ── */
+.clientList { display: flex; flex-direction: column; gap: 0.32rem; }
 
 .clientRow {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
-  animation: rowSlide 0.25s ease both;
-  animation-delay: calc(var(--ri) * 65ms + 80ms);
+  gap: 0.5rem;
+  animation: rowSlide 0.22s ease both;
+  animation-delay: calc(var(--ri) * 60ms + 60ms);
 }
 
 .clientAvatar {
@@ -427,26 +295,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.62rem;
+  font-size: 0.6rem;
   font-weight: 700;
   flex-shrink: 0;
 }
 
 .clientName { font-size: 0.7rem;  font-weight: 500; color: var(--text); }
-.clientSub  { font-size: 0.58rem; color: var(--text-sub); }
+.clientSub  { font-size: 0.57rem; color: var(--text-sub); }
 
-/* ─── Settings toggles (tab 3) ─── */
-.toggleList { display: flex; flex-direction: column; gap: 0.45rem; }
+/* ── Toggles (tab 3) ── */
+.toggleList { display: flex; flex-direction: column; gap: 0.42rem; }
 
 .toggleRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  animation: rowSlide 0.25s ease both;
-  animation-delay: calc(var(--ri) * 55ms + 60ms);
+  animation: rowSlide 0.22s ease both;
+  animation-delay: calc(var(--ri) * 52ms + 50ms);
 }
 
-.toggleLabel { font-size: 0.68rem; color: var(--text-dim); }
+.toggleLabel { font-size: 0.67rem; color: var(--text-dim); }
 
 .pill {
   width: 28px;
@@ -460,53 +328,48 @@
   flex-shrink: 0;
 }
 
-.pillOn {
-  background: var(--accent-muted);
-  border: 1px solid rgba(0, 237, 100, 0.45);
-}
+.pillOn { background: var(--accent-muted); border: 1px solid rgba(0, 237, 100, 0.42); }
 
 .pillThumb {
   width: 10px;
   height: 10px;
   border-radius: 50%;
   background: var(--text-sub);
-  transition: transform 0.18s ease, background 0.18s ease;
+  transition: transform 0.16s ease, background 0.16s ease;
 }
 
-.pillOn .pillThumb {
-  transform: translateX(12px);
-  background: var(--accent);
-}
+.pillOn .pillThumb { transform: translateX(12px); background: var(--accent); }
 
-/* ─── Demo CTA ─── */
+/* ── Demo CTA ── */
 .demoBtn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  padding: 0.6rem;
+  padding: 0.58rem;
   background: var(--accent-muted);
   border-top: 1px solid rgba(0, 237, 100, 0.18);
   color: var(--accent);
-  font-size: 0.68rem;
+  font-size: 0.67rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-decoration: none;
   text-transform: uppercase;
-  transition: background 0.15s ease, gap 0.15s ease;
-  animation: demoBtnIn 0.35s ease both;
-  animation-delay: 420ms;
+  flex-shrink: 0;
+  transition: background 0.14s, gap 0.14s;
+  animation: demoBtnIn 0.3s ease both;
+  animation-delay: 380ms;
 }
 
 @keyframes demoBtnIn {
-  from { opacity: 0; transform: translateY(5px); }
+  from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: translateY(0);   }
 }
 
-.demoBtn:hover { background: rgba(0, 237, 100, 0.14); gap: 0.65rem; }
+.demoBtn:hover { background: rgba(0, 237, 100, 0.13); gap: 0.7rem; }
 
-/* Shared row slide */
+/* ── Shared ── */
 @keyframes rowSlide {
-  from { opacity: 0; transform: translateX(-8px); }
+  from { opacity: 0; transform: translateX(-7px); }
   to   { opacity: 1; transform: translateX(0);    }
 }

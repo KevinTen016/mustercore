@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { isAuthed } from '@/lib/session';
 import { db } from '@/lib/db';
+import { logger } from '@/lib/logger';
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   if (!isAuthed(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const { id } = await params;
 
   let body: Record<string, unknown>;
   try {
@@ -17,14 +20,25 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     return NextResponse.json({ error: 'Ungültiger Status' }, { status: 400 });
   }
 
-  const updated = db.demos.update(params.id, { status: body.status as typeof ALLOWED[number] });
-  if (!updated) return NextResponse.json({ error: 'Nicht gefunden' }, { status: 404 });
-  return NextResponse.json(updated);
+  try {
+    const updated = await db.demos.update(id, { status: body.status as typeof ALLOWED[number] });
+    if (!updated) return NextResponse.json({ error: 'Nicht gefunden' }, { status: 404 });
+    return NextResponse.json(updated);
+  } catch (err) {
+    logger.error('[demos/id] update error', { id, err: err instanceof Error ? err.message : String(err) });
+    return NextResponse.json({ error: 'Interner Fehler' }, { status: 500 });
+  }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   if (!isAuthed(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const ok = db.demos.remove(params.id);
-  if (!ok) return NextResponse.json({ error: 'Nicht gefunden' }, { status: 404 });
-  return NextResponse.json({ ok: true });
+  const { id } = await params;
+  try {
+    const ok = await db.demos.remove(id);
+    if (!ok) return NextResponse.json({ error: 'Nicht gefunden' }, { status: 404 });
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    logger.error('[demos/id] delete error', { id, err: err instanceof Error ? err.message : String(err) });
+    return NextResponse.json({ error: 'Interner Fehler' }, { status: 500 });
+  }
 }

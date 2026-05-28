@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { BRANCHEN } from '@/data/branchen';
 import s from './Header.module.css';
 
@@ -16,6 +16,8 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const drawerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem('wc_theme') as 'dark' | 'light' | null;
@@ -30,7 +32,44 @@ export function Header() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => { if (open) document.body.style.overflow = 'hidden'; else document.body.style.overflow = ''; }, [open]);
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+
+      // Focus first focusable element in drawer
+      const drawer = drawerRef.current;
+      if (!drawer) return;
+      const focusable = Array.from(
+        drawer.querySelectorAll<HTMLElement>(
+          'button, [href], input, [tabindex]:not([tabindex="-1"])'
+        )
+      );
+      focusable[0]?.focus();
+
+      function handleKeyDown(e: KeyboardEvent) {
+        if (e.key === 'Escape') {
+          setOpen(false);
+          return;
+        }
+        if (e.key === 'Tab' && focusable.length > 0) {
+          const first = focusable[0];
+          const last  = focusable[focusable.length - 1];
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [open]);
 
   function toggleTheme() {
     const next = theme === 'dark' ? 'light' : 'dark';
@@ -56,8 +95,21 @@ export function Header() {
               Leistungen
             </Link>
 
-            <div className={s.dropdown}>
-              <button className={s.navLink} aria-haspopup="true" aria-expanded="false">
+            <div
+              className={s.dropdown}
+              onMouseEnter={() => setDropdownOpen(true)}
+              onMouseLeave={() => setDropdownOpen(false)}
+              onFocus={() => setDropdownOpen(true)}
+              onBlur={(e) => {
+                if (!e.currentTarget.contains(e.relatedTarget as Node)) setDropdownOpen(false);
+              }}
+            >
+              <button
+                className={s.navLink}
+                aria-haspopup="menu"
+                aria-expanded={dropdownOpen}
+                onClick={() => setDropdownOpen(v => !v)}
+              >
                 Branchen
                 <svg className={s.navLinkCaret} width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
                   <path d="M2 4l4 4 4-4"/>
@@ -89,7 +141,19 @@ export function Header() {
               aria-label={theme === 'dark' ? 'Zum hellen Modus wechseln' : 'Zum dunklen Modus wechseln'}
               title={theme === 'dark' ? 'Heller Modus' : 'Dunkler Modus'}
             >
-              {theme === 'dark' ? '☀️' : '🌙'}
+              {theme === 'dark' ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="5"/>
+                  <line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                  <line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+              ) : (
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+              )}
             </button>
 
             <Link href="/demo" className="btn btn-primary btn-sm">
@@ -111,14 +175,21 @@ export function Header() {
         </div>
       </header>
 
-      {/* Mobile Overlay + Drawer */}
-      <div className={`${s.overlay}${open ? ` ${s.open}` : ''}`} onClick={() => setOpen(false)} aria-hidden="true" />
+      {/* Mobile Overlay */}
+      <div
+        className={`${s.overlay}${open ? ` ${s.open}` : ''}`}
+        onClick={() => setOpen(false)}
+        aria-hidden="true"
+      />
 
+      {/* Mobile Drawer */}
       <nav
+        ref={drawerRef}
         id="mobile-drawer"
         className={`${s.drawer}${open ? ` ${s.open}` : ''}`}
         aria-label="Mobile Navigation"
         aria-hidden={!open}
+        aria-modal="true"
       >
         <button className={s.drawerClose} onClick={() => setOpen(false)} aria-label="Menü schließen">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
@@ -127,10 +198,10 @@ export function Header() {
         </button>
 
         <Link href="/leistungen" className={s.drawerLink} onClick={() => setOpen(false)}>Leistungen</Link>
-        <Link href="/preise" className={s.drawerLink} onClick={() => setOpen(false)}>Preise</Link>
-        <Link href="/ueber-uns" className={s.drawerLink} onClick={() => setOpen(false)}>Über uns</Link>
-        <Link href="/kontakt" className={s.drawerLink} onClick={() => setOpen(false)}>Kontakt</Link>
-        <Link href="/faq" className={s.drawerLink} onClick={() => setOpen(false)}>FAQ</Link>
+        <Link href="/preise"     className={s.drawerLink} onClick={() => setOpen(false)}>Preise</Link>
+        <Link href="/ueber-uns"  className={s.drawerLink} onClick={() => setOpen(false)}>Über uns</Link>
+        <Link href="/kontakt"    className={s.drawerLink} onClick={() => setOpen(false)}>Kontakt</Link>
+        <Link href="/faq"        className={s.drawerLink} onClick={() => setOpen(false)}>FAQ</Link>
 
         <hr className={s.drawerDivider} />
         <div className={s.drawerLabel}>Branchen</div>

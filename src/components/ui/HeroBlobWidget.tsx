@@ -1,73 +1,144 @@
 'use client';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import s from './HeroBlobWidget.module.css';
 
-type Phase = 'idle' | 'exiting' | 'revealed';
-type Tab = 0 | 1 | 2 | 3;
+type Phase = 'idle' | 'revealed';
+type Tab   = 0 | 1 | 2 | 3;
+
+interface Dot { x: number; y: number; bx: number; by: number; }
 
 const NAV = [
-  { icon: '◈', label: 'Kalender' },
-  { icon: '◎', label: 'Statistik' },
-  { icon: '◇', label: 'Kunden' },
+  { icon: '◈', label: 'Kalender'      },
+  { icon: '◎', label: 'Statistik'     },
+  { icon: '◇', label: 'Kunden'        },
   { icon: '⚙', label: 'Einstellungen' },
 ] as const;
 
 export function HeroBlobWidget() {
   const [phase, setPhase] = useState<Phase>('idle');
-  const [tab, setTab]   = useState<Tab>(0);
-  const containerRef    = useRef<HTMLDivElement>(null);
-  const blobRef         = useRef<HTMLDivElement>(null);
+  const [tab,   setTab]   = useState<Tab>(0);
 
-  const onMouseMove = useCallback((e: MouseEvent) => {
-    if (!containerRef.current || !blobRef.current || phase !== 'idle') return;
-    const r = containerRef.current.getBoundingClientRect();
-    blobRef.current.style.setProperty('--mx', ((e.clientX - r.left) / r.width  - 0.5).toFixed(3));
-    blobRef.current.style.setProperty('--my', ((e.clientY - r.top)  / r.height - 0.5).toFixed(3));
-  }, [phase]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef    = useRef<HTMLCanvasElement>(null);
+  const phaseRef     = useRef<Phase>('idle');
+  const mouseRef     = useRef({ x: -9999, y: -9999 });
+  const dotsRef      = useRef<Dot[]>([]);
+  const sizeRef      = useRef({ w: 0, h: 0 });
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    el.addEventListener('mousemove', onMouseMove);
-    return () => el.removeEventListener('mousemove', onMouseMove);
-  }, [onMouseMove]);
+    const canvas    = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+
+    const ctx = canvas.getContext('2d')!;
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+    const GAP = 24;
+    let rafId = 0;
+
+    function resize() {
+      if (!canvas || !container) return;
+      const rect = container.getBoundingClientRect();
+      const w = Math.round(rect.width)  || 460;
+      const h = Math.round(rect.height) || 340;
+      sizeRef.current = { w, h };
+
+      canvas.width  = w * DPR;
+      canvas.height = h * DPR;
+      canvas.style.width  = w + 'px';
+      canvas.style.height = h + 'px';
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+      const cols = Math.floor((w - GAP / 2) / GAP);
+      const rows = Math.floor((h - GAP / 2) / GAP);
+      const padX = (w - (cols - 1) * GAP) / 2;
+      const padY = (h - (rows - 1) * GAP) / 2;
+
+      dotsRef.current = [];
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const x = padX + c * GAP;
+          const y = padY + r * GAP;
+          dotsRef.current.push({ x, y, bx: x, by: y });
+        }
+      }
+    }
+
+    function draw() {
+      const { w, h } = sizeRef.current;
+      if (phaseRef.current === 'revealed') return;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const mx = mouseRef.current.x;
+      const my = mouseRef.current.y;
+
+      for (const dot of dotsRef.current) {
+        const dist = Math.hypot(mx - dot.x, my - dot.y);
+        const infl = Math.max(0, 1 - dist / 88) ** 2;
+
+        let radius: number;
+        let color:  string;
+
+        if (infl > 0.005) {
+          radius = 1.8 + infl * 4;
+          color  = `rgba(0,237,100,${(0.2 + infl * 0.76).toFixed(2)})`;
+        } else {
+          radius = 1.8;
+          color  = 'rgba(155,160,180,0.17)';
+        }
+
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+      }
+
+      rafId = requestAnimationFrame(draw);
+    }
+
+    resize();
+    rafId = requestAnimationFrame(draw);
+
+    const ro = new ResizeObserver(resize);
+    ro.observe(container);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      ro.disconnect();
+    };
+  }, []);
+
+  function handleMouseMove(e: React.MouseEvent<HTMLCanvasElement>) {
+    const r = e.currentTarget.getBoundingClientRect();
+    mouseRef.current = { x: e.clientX - r.left, y: e.clientY - r.top };
+  }
 
   function handleClick() {
-    if (phase !== 'idle') return;
-    setPhase('exiting');
-    setTimeout(() => setPhase('revealed'), 580);
+    if (phaseRef.current !== 'idle') return;
+    phaseRef.current = 'revealed';
+    setPhase('revealed');
   }
 
   return (
-    <div
-      ref={containerRef}
-      className={`${s.container} ${phase === 'idle' ? s.clickable : ''}`}
-      onClick={phase === 'idle' ? handleClick : undefined}
-    >
-      {/* ── Blob ── */}
+    <div ref={containerRef} className={s.container}>
+
       {phase !== 'revealed' && (
-        <div
-          ref={blobRef}
-          className={`${s.blobWrap} ${phase === 'exiting' ? s.blobExit : ''}`}
-          style={{ '--mx': '0', '--my': '0' } as React.CSSProperties}
-        >
-          <div className={s.blobShape} />
-          <div className={s.blobGloss} />
-          <div className={s.blobRing} />
-        </div>
+        <canvas
+          ref={canvasRef}
+          className={s.canvas}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={() => { mouseRef.current = { x: -9999, y: -9999 }; }}
+          onClick={handleClick}
+          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick(); } }}
+          tabIndex={0}
+          role="button"
+          aria-label="Admin-Panel-Demo anzeigen"
+          style={{ cursor: 'pointer' }}
+        />
       )}
 
-      {phase === 'idle' && (
-        <div className={s.hint} aria-hidden="true">
-          <span className={s.hintRipple} />
-          <span className={s.hintLabel}>klicken</span>
-        </div>
-      )}
-
-      {/* ── Admin panel ── */}
       {phase === 'revealed' && (
         <div className={s.card}>
-          {/* Browser chrome */}
           <div className={s.browserBar}>
             <span className={s.bdot} style={{ background: '#ff5f57' }} />
             <span className={s.bdot} style={{ background: '#febc2e' }} />
@@ -76,7 +147,6 @@ export function HeroBlobWidget() {
           </div>
 
           <div className={s.adminLayout}>
-            {/* Sidebar */}
             <nav className={s.adminSidebar} aria-label="Admin-Navigation">
               <div className={s.sidebarBrand}>W</div>
               {NAV.map((item, i) => (
@@ -93,7 +163,6 @@ export function HeroBlobWidget() {
               ))}
             </nav>
 
-            {/* Tab content — key forces re-mount → plays entrance animation */}
             <div className={s.adminMain} key={tab}>
               {tab === 0 && <TabKalender />}
               {tab === 1 && <TabStatistik />}
@@ -102,9 +171,8 @@ export function HeroBlobWidget() {
             </div>
           </div>
 
-          {/* CTA — update href once deployed */}
           <a
-            href="http://localhost:8080"
+            href={process.env.NEXT_PUBLIC_DEMO_URL ?? '/demo'}
             target="_blank"
             rel="noopener noreferrer"
             className={s.demoBtn}
@@ -121,33 +189,36 @@ export function HeroBlobWidget() {
   );
 }
 
+/* ── Tab: Kalender ── */
 function TabKalender() {
+  const appts = [
+    { time: '09:00', name: 'Maria S.',  service: 'Haarschnitt',  color: '#00ed64' },
+    { time: '10:30', name: 'Tom K.',    service: 'Bart trimmen', color: '#3b82f6' },
+    { time: '12:00', name: 'Anna M.',   service: 'Färben',       color: '#a855f7' },
+  ];
   return (
     <div className={s.tabContent}>
       <div className={s.adminHead}>
         <span className={s.adminTitle}>Heute</span>
-        <span className={s.adminDate}>Do, 21. Mai</span>
+        <span className={s.adminDateGreen}>7 Termine</span>
       </div>
       <div className={s.stats}>
         <div className={s.stat}>
-          <div className={`${s.statVal} ${s.colAccent}`}>12</div>
-          <div className={s.statLabel}>Termine</div>
+          <div className={`${s.statVal} ${s.colAccent}`}>340 €</div>
+          <div className={s.statLabel}>Tagesumsatz</div>
         </div>
         <div className={s.stat}>
-          <div className={`${s.statVal} ${s.colGreen}`}>1.340 €</div>
-          <div className={s.statLabel}>Umsatz</div>
+          <div className={`${s.statVal} ${s.colGreen}`}>4 / 7</div>
+          <div className={s.statLabel}>Erledigt</div>
         </div>
       </div>
       <div className={s.appointments}>
-        {([
-          ['09:00', 'Sarah M.', '#00ed64'],
-          ['10:30', 'Tom K.',   '#4a9eff'],
-          ['12:00', 'Jana L.',  '#a855f7'],
-        ] as [string, string, string][]).map(([time, name, color], i) => (
+        {appts.map((a, i) => (
           <div key={i} className={s.apptRow} style={{ '--ri': i } as React.CSSProperties}>
-            <span className={s.apptDot} style={{ background: color }} />
-            <span className={s.apptTime}>{time}</span>
-            <span className={s.apptName}>{name}</span>
+            <span className={s.apptDot} style={{ background: a.color }} />
+            <span className={s.apptTime}>{a.time}</span>
+            <span className={s.apptName}>{a.name}</span>
+            <span className={s.apptService}>{a.service}</span>
           </div>
         ))}
       </div>
@@ -155,52 +226,64 @@ function TabKalender() {
   );
 }
 
+/* ── Tab: Statistik ── */
 function TabStatistik() {
-  const bars = [6, 9, 7, 13, 11, 8, 3];
-  const days = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
-  const max  = Math.max(...bars);
+  const days = [
+    { d: 'Mo', h: '52%' },
+    { d: 'Di', h: '68%' },
+    { d: 'Mi', h: '41%' },
+    { d: 'Do', h: '79%' },
+    { d: 'Fr', h: '88%' },
+    { d: 'Sa', h: '60%', today: true },
+    { d: 'So', h: '5%'  },
+  ];
   return (
     <div className={s.tabContent}>
       <div className={s.adminHead}>
         <span className={s.adminTitle}>Diese Woche</span>
-        <span className={s.adminDateGreen}>↑ +18 %</span>
+        <span className={s.adminDateGreen}>↑ 12 %</span>
       </div>
       <div className={s.barChart}>
-        {bars.map((v, i) => (
+        {days.map((d, i) => (
           <div key={i} className={s.barCol}>
             <div
-              className={`${s.bar}${i === 3 ? ` ${s.barToday}` : ''}`}
-              style={{ '--h': `${(v / max) * 100}%`, '--bi': i } as React.CSSProperties}
+              className={`${s.bar}${d.today ? ` ${s.barToday}` : ''}`}
+              style={{ '--h': d.h, '--bi': i } as React.CSSProperties}
             />
-            <span className={s.barDay}>{days[i]}</span>
+            <span className={s.barDay}>{d.d}</span>
           </div>
         ))}
       </div>
       <div className={s.revRow}>
         <span className={s.revLabel}>Monatsumsatz</span>
-        <span className={s.revVal}>5.840 €</span>
+        <span className={s.revVal}>2.840 €</span>
       </div>
     </div>
   );
 }
 
+/* ── Tab: Kunden ── */
 function TabKunden() {
   const clients = [
-    { name: 'Sarah M.', sub: 'Letzter Besuch: 14. Mai', color: '#00ed64' },
-    { name: 'Tom K.',   sub: '3 Termine · Stammkunde',  color: '#4a9eff' },
-    { name: 'Jana L.',  sub: 'Letzter Besuch: 08. Mai', color: '#a855f7' },
+    { initials: 'MS', name: 'Maria Schmidt', sub: 'Heute · Haarschnitt', color: '#00ed64' },
+    { initials: 'TK', name: 'Tom Koch',      sub: '23. Mai · Bart',      color: '#3b82f6' },
+    { initials: 'AM', name: 'Anna Mayer',    sub: '20. Mai · Färben',    color: '#a855f7' },
+    { initials: 'LB', name: 'Lisa Berg',     sub: '18. Mai · Maniküre',  color: '#f59e0b' },
   ];
   return (
     <div className={s.tabContent}>
       <div className={s.adminHead}>
         <span className={s.adminTitle}>Kunden</span>
-        <span className={s.adminDate}>24 gesamt</span>
+        <span className={s.adminDate}>47 gesamt</span>
       </div>
       <div className={s.clientList}>
         {clients.map((c, i) => (
           <div key={i} className={s.clientRow} style={{ '--ri': i } as React.CSSProperties}>
-            <div className={s.clientAvatar} style={{ background: `${c.color}22`, color: c.color }}>
-              {c.name[0]}
+            <div
+              className={s.clientAvatar}
+              style={{ background: c.color + '22', color: c.color }}
+            >
+              {c.initials}
             </div>
             <div>
               <div className={s.clientName}>{c.name}</div>
@@ -213,12 +296,13 @@ function TabKunden() {
   );
 }
 
+/* ── Tab: Einstellungen ── */
 function TabSetup() {
   const items = [
-    { label: 'Online-Buchung',      on: true  },
-    { label: 'E-Mail-Bestätigung',  on: true  },
-    { label: 'Telegram-Notify',     on: false },
-    { label: 'Wartungsmodus',       on: false },
+    { label: 'Online-Buchung',     on: true  },
+    { label: 'E-Mail-Bestätigung', on: true  },
+    { label: 'Telegram-Notify',    on: false },
+    { label: 'Wartungsmodus',      on: false },
   ];
   return (
     <div className={s.tabContent}>

@@ -124,6 +124,11 @@ strong { font-weight: 600; color: var(--text); }
   overflow: hidden;
 }
 
+[data-theme="light"] .card {
+  border-color: rgba(15, 15, 30, 0.06);
+  box-shadow: var(--shadow-sm);
+}
+
 /* ================================================
    FORMULAR
    ================================================ */
@@ -189,13 +194,18 @@ select.form-control {
 .badge-accent {
   background: var(--accent-muted);
   color: var(--accent);
-  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
 }
 
 .badge-green {
   background: var(--green-muted);
   color: var(--green);
-  border: 1px solid color-mix(in srgb, var(--green) 25%, transparent);
+  border: 1px solid color-mix(in srgb, var(--green) 20%, transparent);
+}
+
+[data-theme="light"] .badge-accent,
+[data-theme="light"] .badge-green {
+  border-color: transparent;
 }
 
 /* ================================================
@@ -213,6 +223,20 @@ select.form-control {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+@keyframes twBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.tw-cursor {
+  color: var(--accent);
+  user-select: none;
+}
+
+.tw-cursor--blink {
+  animation: twBlink 1s step-end infinite;
 }
 
 .animate-fadeup { animation: fadeUp 0.55s cubic-bezier(0.4, 0, 0.2, 1) both; }
