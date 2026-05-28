@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { getConsent, setConsent, hasConsent } from '@/lib/consent';
+import { getConsent, setConsent, hasConsent, CONSENT_ALL, CONSENT_NECESSARY } from '@/lib/consent';
 import s from './CookieBanner.module.css';
 
 export function CookieBanner() {
@@ -15,12 +15,12 @@ export function CookieBanner() {
   }, []);
 
   function acceptAll() {
-    setConsent('all');
+    setConsent(CONSENT_ALL);
     setVisible(false);
   }
 
   function acceptNecessary() {
-    setConsent('necessary');
+    setConsent(CONSENT_NECESSARY);
     setVisible(false);
   }
 
