@@ -6,9 +6,9 @@ import { ADD_ONS, SEO_SERVICE } from '@/data/add-ons';
 import { TypewriterH1 } from '@/components/ui/TypewriterH1';
 
 export const metadata: Metadata = buildMetadata({
-  title: 'Preise — WebCore BASIS, STANDARD, PREMIUM',
+  title: 'Preise — MusterCore BASIS, STANDARD, PREMIUM',
   description:
-    'Transparente Preise für WebCore: BASIS ab 99 €/Monat, STANDARD ab 129 €, PREMIUM ab 199 €. Alle Beträge netto zzgl. 19 % USt.',
+    'Transparente Preise für MusterCore: BASIS ab 99 €/Monat, STANDARD ab 129 €, PREMIUM ab 199 €. Alle Beträge netto zzgl. 19 % USt.',
   path: '/preise',
 });
 

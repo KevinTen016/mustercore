@@ -6,7 +6,7 @@ import { TypewriterH1 } from '@/components/ui/TypewriterH1';
 export const metadata: Metadata = buildMetadata({
   title: 'FAQ — Häufige Fragen',
   description:
-    'Häufig gestellte Fragen zu WebCore: Preise, DSGVO, Kündigung, Datensicherheit, Buchungssystem und mehr.',
+    'Häufig gestellte Fragen zu MusterCore: Preise, DSGVO, Kündigung, Datensicherheit, Buchungssystem und mehr.',
   path: '/faq',
 });
 
@@ -16,12 +16,12 @@ const CATEGORIES = [
     title: 'Allgemein',
     items: [
       {
-        q: 'Was ist WebCore?',
-        a: 'WebCore ist ein Abo-Dienst für lokale Unternehmen in Deutschland. Sie erhalten eine professionelle Website, ein Online-Buchungssystem und ein Admin-Panel — eingerichtet in 5–7 Werktagen, ohne Agentur-Aufwand.',
+        q: 'Was ist MusterCore?',
+        a: 'MusterCore ist ein Abo-Dienst für lokale Unternehmen in Deutschland. Sie erhalten eine professionelle Website, ein Online-Buchungssystem und ein Admin-Panel — eingerichtet in 5–7 Werktagen, ohne Agentur-Aufwand.',
       },
       {
-        q: 'Für wen eignet sich WebCore?',
-        a: 'WebCore richtet sich an lokale Dienstleister, die Termine vergeben: Friseursalons, Arztpraxen, Physiotherapiepraxen, Autowerkstätten, Fitnessstudios, Tattoostudios und ähnliche Betriebe.',
+        q: 'Für wen eignet sich MusterCore?',
+        a: 'MusterCore richtet sich an lokale Dienstleister, die Termine vergeben: Friseursalons, Arztpraxen, Physiotherapiepraxen, Autowerkstätten, Fitnessstudios, Tattoostudios und ähnliche Betriebe.',
       },
       {
         q: 'Wie schnell bin ich nach Vertragsabschluss online?',
@@ -38,7 +38,7 @@ const CATEGORIES = [
     title: 'Preise & Laufzeit',
     items: [
       {
-        q: 'Was kostet WebCore?',
+        q: 'Was kostet MusterCore?',
         a: 'BASIS ab 99 €/Monat (netto), STANDARD ab 129 €/Monat (netto), PREMIUM ab 199 €/Monat (netto). Dazu kommt eine einmalige Setup-Gebühr je nach Paket. Alle Preise netto zzgl. 19 % USt.',
       },
       {
@@ -85,7 +85,7 @@ const CATEGORIES = [
       },
       {
         q: 'Kann ich meine eigene Domain verwenden?',
-        a: 'Ja, ab STANDARD. Wir übernehmen die Registrierung und Verlängerung Ihrer Wunschdomain. Im BASIS-Paket erhalten Sie eine Subdomain auf webcore.de.',
+        a: 'Ja, ab STANDARD. Wir übernehmen die Registrierung und Verlängerung Ihrer Wunschdomain. Im BASIS-Paket erhalten Sie eine Subdomain auf mustercore.de.',
       },
     ],
   },
@@ -98,7 +98,7 @@ const CATEGORIES = [
         a: 'Ja. Alle Daten werden ausschließlich in der EU gehostet, in einem Rechenzentrum in Deutschland. Jeder Kunde erhält einen eigenen, isolierten Container — Ihre Daten werden niemals mit anderen Betrieben vermischt.',
       },
       {
-        q: 'Ist WebCore DSGVO-konform?',
+        q: 'Ist MusterCore DSGVO-konform?',
         a: 'Ja. Im Paket enthalten sind: Impressum, Datenschutzerklärung, Cookie-Banner nach TTDSG sowie ein AV-Vertrag nach Art. 28 DSGVO.',
       },
       {
@@ -128,7 +128,7 @@ const CATEGORIES = [
         a: 'Ab STANDARD ist eine Designanpassung pro Jahr inklusive (Farbpalette, Schrift, Fotos). Zusätzliche Anpassungen sind als Add-on buchbar.',
       },
       {
-        q: 'Kann ich WebCore vor dem Kauf testen?',
+        q: 'Kann ich MusterCore vor dem Kauf testen?',
         a: 'Ja. Fordern Sie eine kostenlose Demo an — wir zeigen Ihnen das Admin-Panel live in einem 20-minütigen Video-Call, ohne Verkaufsdruck und ohne Verpflichtung.',
       },
     ],

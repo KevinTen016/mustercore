@@ -6,7 +6,7 @@ export interface Branche {
   teaser: string;         // 1 Satz für Branchen-Grid auf Startseite
   heroLine: string;       // Headline auf Branchen-Unterseite
   painPoints: string[];   // Was nervt? (3–4 Punkte)
-  gains: string[];        // Was bringt WebCore? (3–4 Punkte)
+  gains: string[];        // Was bringt MusterCore? (3–4 Punkte)
   cta: string;
 }
 

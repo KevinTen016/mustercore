@@ -84,8 +84,8 @@ export function Header() {
         <div className={`container ${s.inner}`}>
 
           {/* Logo */}
-          <Link href="/" className={s.logo} aria-label="WebCore — Startseite">
-            <span className={s.logoMark}>WebCore</span>
+          <Link href="/" className={s.logo} aria-label="MusterCore — Startseite">
+            <span className={s.logoMark}>MusterCore</span>
             <span className={s.logoSub} aria-hidden="true">Website&nbsp;&amp;&nbsp;Buchung</span>
           </Link>
 

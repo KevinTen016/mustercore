@@ -87,7 +87,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         {/* CTA */}
         <div style={{ marginTop: '3.5rem', padding: '1.75rem 2rem', background: 'var(--bg-card)', border: '1px solid var(--line)', borderRadius: 'var(--radius-xl)' }}>
           <p style={{ fontWeight: 600, color: 'var(--text)', marginBottom: '0.5rem', fontSize: '0.95rem' }}>
-            Neugierig, wie WebCore für Ihren Betrieb aussieht?
+            Neugierig, wie MusterCore für Ihren Betrieb aussieht?
           </p>
           <p style={{ fontSize: '0.875rem', marginBottom: '1.25rem' }}>
             Fordern Sie eine kostenlose Demo an — 20 Minuten, kein Verkaufsdruck.

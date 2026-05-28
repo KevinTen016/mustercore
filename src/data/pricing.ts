@@ -28,7 +28,7 @@ export interface Plan {
 export const PLANS: Plan[] = [
   {
     id: 'basis',
-    name: 'WebCore BASIS',
+    name: 'MusterCore BASIS',
     tagline: 'Schnell online. Alles Wichtige inklusive.',
     price: 99,
     setupFee: 199,
@@ -38,7 +38,7 @@ export const PLANS: Plan[] = [
     support: 'E-Mail, Reaktion innerhalb 48 Wertstunden',
     features: [
       { text: 'Professionelle Website auf Vorlage', included: true },
-      { text: 'Subdomain betrieb.webcore.de', included: true },
+      { text: 'Subdomain betrieb.mustercore.de', included: true },
       { text: 'Online-Buchung mit Kalender', included: true },
       { text: 'Admin-Panel (Buchungen, Preisliste, Urlaub, Mitarbeiter, Statistik)', included: true },
       { text: 'E-Mail-Bestätigung + Erinnerung 24 h vorher', included: true },
@@ -56,7 +56,7 @@ export const PLANS: Plan[] = [
   },
   {
     id: 'standard',
-    name: 'WebCore STANDARD',
+    name: 'MusterCore STANDARD',
     tagline: 'Professionell wachsen. Mit allem, was zählt.',
     price: 129,
     setupFee: 299,
@@ -79,7 +79,7 @@ export const PLANS: Plan[] = [
   },
   {
     id: 'premium',
-    name: 'WebCore PREMIUM',
+    name: 'MusterCore PREMIUM',
     tagline: 'Alles inklusive. Für Betriebe, die keine Kompromisse machen.',
     price: 199,
     setupFee: 599,

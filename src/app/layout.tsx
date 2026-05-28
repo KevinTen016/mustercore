@@ -13,15 +13,15 @@ import '@/styles/globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: 'WebCore — Professionelle Website & Buchungssystem für lokale Unternehmen',
-    template: '%s | WebCore',
+    default: 'MusterCore — Professionelle Website & Buchungssystem für lokale Unternehmen',
+    template: '%s | MusterCore',
   },
   description:
-    'WebCore gibt lokalen Unternehmen eine professionelle Website mit Online-Buchung und eigenem Admin-Panel. DSGVO-konform, EU-Hosting, aus Braunschweig.',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'https://webcore.de'),
+    'MusterCore gibt lokalen Unternehmen eine professionelle Website mit Online-Buchung und eigenem Admin-Panel. DSGVO-konform, EU-Hosting, aus Braunschweig.',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'https://mustercore.de'),
   robots: { index: true, follow: true },
   openGraph: {
-    siteName: 'WebCore',
+    siteName: 'MusterCore',
     locale: 'de_DE',
     type: 'website',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],

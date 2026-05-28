@@ -5,9 +5,9 @@ import { FIRMA } from '@/data/firma';
 import { TypewriterH1 } from '@/components/ui/TypewriterH1';
 
 export const metadata: Metadata = buildMetadata({
-  title: 'Über WebCore',
+  title: 'Über MusterCore',
   description:
-    'WebCore ist ein Einzelunternehmen aus Braunschweig. Wir entwickeln und betreiben Websites mit Online-Buchung für lokale Unternehmen in Deutschland.',
+    'MusterCore ist ein Einzelunternehmen aus Braunschweig. Wir entwickeln und betreiben Websites mit Online-Buchung für lokale Unternehmen in Deutschland.',
   path: '/ueber-uns',
 });
 
@@ -38,10 +38,10 @@ export default function UeberUnsPage() {
           Über uns
         </p>
         <TypewriterH1 style={{ marginBottom: '0.75rem' }}>
-          WebCore — aus Braunschweig, für lokale Betriebe.
+          MusterCore — aus Braunschweig, für lokale Betriebe.
         </TypewriterH1>
         <p style={{ maxWidth: '60ch', marginBottom: '3rem', fontSize: '1.05rem' }}>
-          WebCore ist ein Einzelunternehmen aus {FIRMA.ort}, {FIRMA.bundesland}. Wir entwickeln
+          MusterCore ist ein Einzelunternehmen aus {FIRMA.ort}, {FIRMA.bundesland}. Wir entwickeln
           und betreiben Websites mit Online-Buchungssystem und Admin-Panel für lokale
           Dienstleister in Deutschland.
         </p>
@@ -49,7 +49,7 @@ export default function UeberUnsPage() {
         {/* Story */}
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--line)', borderRadius: 'var(--radius-xl)', padding: 'clamp(1.5rem, 3vw, 2.5rem)', marginBottom: '3rem' }}>
           <h2 style={{ fontSize: 'clamp(1.15rem, 2.5vw, 1.5rem)', marginBottom: '1rem' }}>
-            Warum WebCore?
+            Warum MusterCore?
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <p style={{ margin: 0, fontSize: '0.95rem' }}>
@@ -63,7 +63,7 @@ export default function UeberUnsPage() {
               Vorlagen verzichten will, blieb bisher ohne gute Option.
             </p>
             <p style={{ margin: 0, fontSize: '0.95rem' }}>
-              WebCore schließt diese Lücke: ein vollständiges System als monatliches Abonnement,
+              MusterCore schließt diese Lücke: ein vollständiges System als monatliches Abonnement,
               eingerichtet in einer Woche, betrieben und aktuell gehalten von uns — damit Sie sich auf
               Ihren Betrieb konzentrieren können.
             </p>

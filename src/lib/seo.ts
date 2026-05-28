@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://webcore.de';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://mustercore.de';
 
 interface SeoProps {
   title: string;
@@ -11,9 +11,9 @@ interface SeoProps {
 
 export function buildMetadata({ title, description, path = '', noindex = false }: SeoProps): Metadata {
   const url = `${BASE_URL}${path}`;
-  const fullTitle = title === 'WebCore'
-    ? 'WebCore — Website & Online-Buchung für lokale Unternehmen'
-    : `${title} | WebCore`;
+  const fullTitle = title === 'MusterCore'
+    ? 'MusterCore — Website & Online-Buchung für lokale Unternehmen'
+    : `${title} | MusterCore`;
 
   return {
     title: fullTitle,
@@ -27,7 +27,7 @@ export function buildMetadata({ title, description, path = '', noindex = false }
       title: fullTitle,
       description,
       url,
-      siteName: 'WebCore',
+      siteName: 'MusterCore',
       locale: 'de_DE',
       type: 'website',
       images: [{ url: '/og-image.png', width: 1200, height: 630, alt: fullTitle }],

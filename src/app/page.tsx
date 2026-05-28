@@ -8,9 +8,9 @@ import { HeroTypewriter } from '@/components/ui/HeroTypewriter';
 import s from './page.module.css';
 
 export const metadata: Metadata = buildMetadata({
-  title: 'WebCore',
+  title: 'MusterCore',
   description:
-    'WebCore gibt lokalen Unternehmen — Friseursalons, Praxen, Werkstätten — eine professionelle Website mit Online-Buchung und eigenem Admin-Panel. DSGVO-konform, EU-Hosting, aus Braunschweig.',
+    'MusterCore gibt lokalen Unternehmen — Friseursalons, Praxen, Werkstätten — eine professionelle Website mit Online-Buchung und eigenem Admin-Panel. DSGVO-konform, EU-Hosting, aus Braunschweig.',
   path: '/',
 });
 
@@ -58,7 +58,7 @@ export default function HomePage() {
               <HeroTypewriter className={s.heroH1} accentClass={s.heroAccent} />
 
               <p className={s.heroSub}>
-                WebCore gibt Ihrem Salon, Ihrer Praxis oder Werkstatt eine professionelle
+                MusterCore gibt Ihrem Salon, Ihrer Praxis oder Werkstatt eine professionelle
                 Online-Präsenz mit eingebautem Buchungssystem — eingerichtet in einer Woche,
                 ohne Agentur-Aufwand, mit voller DSGVO-Sicherheit.
               </p>
@@ -199,7 +199,7 @@ export default function HomePage() {
             <span className={s.sectionEye}>Für wen</span>
             <h2 className={s.sectionH2} id="branchen-h2">Für welche Branchen</h2>
             <p className={s.sectionLead}>
-              WebCore wurde für lokale Dienstleister entwickelt, die Termine vergeben und verwalten.
+              MusterCore wurde für lokale Dienstleister entwickelt, die Termine vergeben und verwalten.
             </p>
           </div>
 
@@ -266,15 +266,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── WARUM WEBCORE ─── */}
+      {/* ─── WARUM MUSTERCORE ─── */}
       <section className={`section ${s.warumSection}`} aria-labelledby="warum-h2">
         <div className="container">
           <div className={s.warumGrid}>
             <div className={s.warumText}>
-              <span className={s.sectionEye} style={{ display: 'block', marginBottom: '0.75rem' }}>Warum WebCore</span>
+              <span className={s.sectionEye} style={{ display: 'block', marginBottom: '0.75rem' }}>Warum MusterCore</span>
               <h2 className={s.sectionH2} id="warum-h2">Kein Baukastenweg. Kein Agentur-Vertrag.</h2>
               <p style={{ fontSize: '1rem', color: 'var(--text-dim)', lineHeight: 1.72, maxWidth: '52ch', marginTop: '0.75rem' }}>
-                WebCore ist ein Abonnement-Produkt für lokale Dienstleister —
+                MusterCore ist ein Abonnement-Produkt für lokale Dienstleister —
                 mit echter Buchungssoftware, klarer Datentrennung und einem direkten Ansprechpartner.
               </p>
 
@@ -347,7 +347,7 @@ export default function HomePage() {
             </h2>
             <p className={s.ctaSub}>
               Wir zeigen Ihnen, wie das Admin-Panel in Ihrem Alltag aussieht —
-              und ob WebCore wirklich zu Ihrem Betrieb passt.
+              und ob MusterCore wirklich zu Ihrem Betrieb passt.
             </p>
 
             <div className={s.ctaButtons}>

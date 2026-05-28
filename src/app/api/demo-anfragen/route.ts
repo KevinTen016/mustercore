@@ -170,7 +170,7 @@ export async function POST(req: Request) {
   const apiKey = process.env.RESEND_API_KEY;
   if (apiKey) {
     const resend    = new Resend(apiKey);
-    const from      = process.env.RESEND_FROM ?? 'WebCore <onboarding@resend.dev>';
+    const from      = process.env.RESEND_FROM ?? 'MusterCore <onboarding@resend.dev>';
     const adminMail = process.env.ADMIN_EMAIL  ?? 'admin@example.com';
 
     const brancheSafe  = escHtml(brancheLabel(branche, brancheCustom));
@@ -188,7 +188,7 @@ export async function POST(req: Request) {
           <p>vielen Dank für Ihre Anfrage! Wir haben Ihre Angaben erhalten und beginnen sofort mit der Erstellung Ihrer persönlichen Demo-Website.</p>
           <p><strong>Sie erhalten Ihre Demo innerhalb von 24 Stunden.</strong></p>
           <p>Bei Fragen melden Sie sich gerne direkt bei uns.</p>
-          <p>Viele Grüße,<br>Das WebCore-Team</p>
+          <p>Viele Grüße,<br>Das MusterCore-Team</p>
         `,
       }),
       resend.emails.send({

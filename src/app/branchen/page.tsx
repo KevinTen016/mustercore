@@ -7,7 +7,7 @@ import { TypewriterH1 } from '@/components/ui/TypewriterH1';
 export const metadata: Metadata = buildMetadata({
   title: 'Für welche Branchen',
   description:
-    'WebCore für Friseursalons, Arztpraxen, Autowerkstätten, Physiotherapeuten, Fitnessstudios und Tattoostudios — Online-Buchung und Admin-Panel für lokale Betriebe.',
+    'MusterCore für Friseursalons, Arztpraxen, Autowerkstätten, Physiotherapeuten, Fitnessstudios und Tattoostudios — Online-Buchung und Admin-Panel für lokale Betriebe.',
   path: '/branchen',
 });
 
@@ -33,7 +33,7 @@ export default function BranchenPage() {
             Für welche Branchen
           </TypewriterH1>
           <p style={{ maxWidth: '56ch' }}>
-            WebCore wurde für lokale Dienstleister entwickelt, die Termine vergeben und verwalten —
+            MusterCore wurde für lokale Dienstleister entwickelt, die Termine vergeben und verwalten —
             von der kleinen Einzelpraxis bis zum Salon mit mehreren Mitarbeitern.
           </p>
         </div>
@@ -84,7 +84,7 @@ export default function BranchenPage() {
               Ihre Branche ist nicht dabei?
             </p>
             <p style={{ fontSize: '0.875rem', margin: 0 }}>
-              WebCore funktioniert für jeden Betrieb, der Termine vergibt. Sprechen Sie uns an —
+              MusterCore funktioniert für jeden Betrieb, der Termine vergibt. Sprechen Sie uns an —
               wir prüfen gerne, ob es passt.
             </p>
           </div>

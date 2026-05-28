@@ -5,7 +5,7 @@ import { TypewriterH1 } from '@/components/ui/TypewriterH1';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Barrierefreiheitserklärung',
-  description: 'Barrierefreiheitserklärung der WebCore Website gemäß BFSG und WCAG 2.1.',
+  description: 'Barrierefreiheitserklärung der MusterCore Website gemäß BFSG und WCAG 2.1.',
   path: '/barrierefreiheit',
 });
 

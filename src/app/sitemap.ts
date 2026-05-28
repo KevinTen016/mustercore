@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { BRANCHEN } from '@/data/branchen';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://webcore.de';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://mustercore.de';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   // Only include pages that are actually indexable (no noindex).

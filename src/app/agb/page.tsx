@@ -5,7 +5,7 @@ import { TypewriterH1 } from '@/components/ui/TypewriterH1';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Allgemeine Geschäftsbedingungen',
-  description: 'AGB von WebCore — Dienstleistungsvertrag, Laufzeit, Kündigung, Haftung.',
+  description: 'AGB von MusterCore — Dienstleistungsvertrag, Laufzeit, Kündigung, Haftung.',
   path: '/agb',
   noindex: true,
 });

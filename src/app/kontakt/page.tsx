@@ -7,7 +7,7 @@ import { TypewriterH1 } from '@/components/ui/TypewriterH1';
 export const metadata: Metadata = buildMetadata({
   title: 'Kontakt',
   description:
-    'WebCore kontaktieren — per E-Mail oder Demo-Anfrage. Kein Autoresponder, kein Ticket-System. Reaktion innerhalb eines Werktages.',
+    'MusterCore kontaktieren — per E-Mail oder Demo-Anfrage. Kein Autoresponder, kein Ticket-System. Reaktion innerhalb eines Werktages.',
   path: '/kontakt',
 });
 
@@ -109,7 +109,7 @@ export default function KontaktPage() {
         <div style={{ padding: '1.25rem 1.5rem', background: 'var(--bg-card)', border: '1px solid var(--line)', borderRadius: 'var(--radius-lg)', fontSize: '0.82rem', color: 'var(--text-sub)' }}>
           <strong style={{ color: 'var(--text-dim)', fontWeight: 600 }}>Vollständige Angaben</strong> finden Sie im{' '}
           <Link href="/impressum" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>Impressum</Link>.
-          {' '}WebCore ist ein Einzelunternehmen aus {FIRMA.ort}, {FIRMA.bundesland}.
+          {' '}MusterCore ist ein Einzelunternehmen aus {FIRMA.ort}, {FIRMA.bundesland}.
         </div>
       </div>
     </div>

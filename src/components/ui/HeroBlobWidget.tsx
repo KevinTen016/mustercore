@@ -143,7 +143,7 @@ export function HeroBlobWidget() {
             <span className={s.bdot} style={{ background: '#ff5f57' }} />
             <span className={s.bdot} style={{ background: '#febc2e' }} />
             <span className={s.bdot} style={{ background: '#28c840' }} />
-            <span className={s.burl}>admin.webcore.de</span>
+            <span className={s.burl}>admin.mustercore.de</span>
           </div>
 
           <div className={s.adminLayout}>

@@ -5,7 +5,7 @@ import { TypewriterH1 } from '@/components/ui/TypewriterH1';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Widerrufsbelehrung',
-  description: 'Widerrufsbelehrung für WebCore-Dienste. B2B-Kontext.',
+  description: 'Widerrufsbelehrung für MusterCore-Dienste. B2B-Kontext.',
   path: '/widerruf',
   noindex: true,
 });

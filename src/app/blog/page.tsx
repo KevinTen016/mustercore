@@ -7,7 +7,7 @@ import { TypewriterH1 } from '@/components/ui/TypewriterH1';
 export const metadata: Metadata = buildMetadata({
   title: 'Ratgeber — Tipps für lokale Unternehmen',
   description:
-    'Der WebCore Ratgeber: Praxisnahe Tipps zu Online-Buchung, DSGVO und Google Business für lokale Betriebe in Deutschland.',
+    'Der MusterCore Ratgeber: Praxisnahe Tipps zu Online-Buchung, DSGVO und Google Business für lokale Betriebe in Deutschland.',
   path: '/blog',
 });
 

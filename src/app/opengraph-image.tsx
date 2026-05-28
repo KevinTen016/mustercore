@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
-export const alt = 'WebCore — Website & Online-Buchung für lokale Unternehmen';
+export const alt = 'MusterCore — Website & Online-Buchung für lokale Unternehmen';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -51,7 +51,7 @@ export default function OGImage() {
             marginBottom: 28,
           }}
         >
-          WebCore
+          MusterCore
         </div>
 
         {/* Sub line */}
@@ -98,7 +98,7 @@ export default function OGImage() {
             letterSpacing: '0.06em',
           }}
         >
-          webcore.de
+          mustercore.de
         </div>
       </div>
     ),

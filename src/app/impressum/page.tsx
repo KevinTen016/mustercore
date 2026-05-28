@@ -5,7 +5,7 @@ import { TypewriterH1 } from '@/components/ui/TypewriterH1';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Impressum',
-  description: 'Impressum der WebCore Website gemäß § 5 TMG.',
+  description: 'Impressum der MusterCore Website gemäß § 5 TMG.',
   path: '/impressum',
   noindex: true,
 });

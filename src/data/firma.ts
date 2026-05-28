@@ -5,7 +5,7 @@
 // ============================================================
 
 export const FIRMA = {
-  marke:            'WebCore',
+  marke:            'MusterCore',
   rechtsform:       'Einzelunternehmen',
   inhaber:          '[Nachname, Vorname]',           // TODO
   strasse:          '[Straße und Hausnummer]',        // TODO
@@ -13,8 +13,8 @@ export const FIRMA = {
   ort:              '[Stadt]',                           // TODO
   bundesland:       '[Bundesland]',                      // TODO
   land:             'Deutschland',
-  email:            '[email@webcore.de]',             // TODO
-  emailKontakt:     '[kontakt@webcore.de]',           // TODO
+  email:            '[email@mustercore.de]',             // TODO
+  emailKontakt:     '[kontakt@mustercore.de]',           // TODO
   telefon:          '[+49 ...]',                      // TODO
   ust_id:           '[DE-Nummer nach Anmeldung]',     // TODO — nach ELSTER-Fragebogen
   steuernummer:     '[Steuernummer]',                 // TODO — nach ELSTER-Fragebogen

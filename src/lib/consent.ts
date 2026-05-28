@@ -1,6 +1,6 @@
 'use client';
 
-const COOKIE_KEY    = 'webcore_consent';
+const COOKIE_KEY    = 'mustercore_consent';
 const COOKIE_MAX_AGE = 365 * 24 * 60 * 60; // 12 Monate
 
 export interface ConsentState {

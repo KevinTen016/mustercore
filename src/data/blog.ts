@@ -79,9 +79,9 @@ Kunden haben das Recht auf Löschung ihrer Daten (Art. 17 DSGVO). Sie müssen in
 
 Wenn Kundendaten kompromittiert werden (z. B. durch einen Hack), müssen Sie das innerhalb von 72 Stunden der zuständigen Datenschutzbehörde melden. In Niedersachsen ist das die LfD Niedersachsen.
 
-**Was WebCore mitbringt**
+**Was MusterCore mitbringt**
 
-WebCore-Kunden bekommen DSGVO-konforme Grundlagen mit: EU-Hosting, AV-Vertrag, Cookie-Banner mit echtem Auswahlrecht, Impressum und Datenschutzerklärung — alles inklusive im Paket.`,
+MusterCore-Kunden bekommen DSGVO-konforme Grundlagen mit: EU-Hosting, AV-Vertrag, Cookie-Banner mit echtem Auswahlrecht, Impressum und Datenschutzerklärung — alles inklusive im Paket.`,
   },
   {
     slug: 'google-business-profil-optimieren',
@@ -123,7 +123,7 @@ Posten Sie Neuigkeiten, Aktionen oder saisonale Angebote direkt im Profil. Googl
 
 **Tipp**
 
-Im WebCore STANDARD-Paket ist die Einrichtung des Google Business Profils inklusive. Wir richten das Profil bei Ihrem Onboarding vollständig ein — Sie müssen sich um nichts kümmern.`,
+Im MusterCore STANDARD-Paket ist die Einrichtung des Google Business Profils inklusive. Wir richten das Profil bei Ihrem Onboarding vollständig ein — Sie müssen sich um nichts kümmern.`,
   },
 ];
 

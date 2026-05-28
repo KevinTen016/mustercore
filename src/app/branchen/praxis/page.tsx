@@ -7,7 +7,7 @@ import { TypewriterH1 } from '@/components/ui/TypewriterH1';
 const DATA = BRANCHEN.find(b => b.slug === 'praxis')!;
 
 export const metadata: Metadata = buildMetadata({
-  title: 'WebCore für Arztpraxen',
+  title: 'MusterCore für Arztpraxen',
   description:
     'Website mit DSGVO-konformer Terminbuchung für Arztpraxen. EU-Hosting, AV-Vertrag inklusive, einfaches Admin-Panel — aus Braunschweig.',
   path: '/branchen/praxis',
@@ -46,7 +46,7 @@ export default function PraxisPage() {
         </div>
 
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--accent)', borderRadius: 'var(--radius-xl)', padding: 'clamp(1.5rem, 3vw, 2rem)', marginBottom: '3rem' }}>
-          <h2 style={{ fontSize: 'clamp(1.1rem, 2.2vw, 1.4rem)', marginBottom: '1.25rem' }}>Was WebCore ändert</h2>
+          <h2 style={{ fontSize: 'clamp(1.1rem, 2.2vw, 1.4rem)', marginBottom: '1.25rem' }}>Was MusterCore ändert</h2>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {DATA.gains.map((gain, i) => (
               <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', fontSize: '0.9rem', color: 'var(--text-dim)' }}>

@@ -7,7 +7,7 @@ import { TypewriterH1 } from '@/components/ui/TypewriterH1';
 const DATA = BRANCHEN.find(b => b.slug === 'friseur')!;
 
 export const metadata: Metadata = buildMetadata({
-  title: 'WebCore für Friseursalons',
+  title: 'MusterCore für Friseursalons',
   description:
     'Website mit Online-Buchung für Friseursalons. Terminbuchung rund um die Uhr, automatische Erinnerungen, Admin-Panel — DSGVO-konform, aus Braunschweig.',
   path: '/branchen/friseur',
@@ -52,7 +52,7 @@ export default function FriseurPage() {
         {/* Gains */}
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--accent)', borderRadius: 'var(--radius-xl)', padding: 'clamp(1.5rem, 3vw, 2rem)', marginBottom: '3rem' }}>
           <h2 style={{ fontSize: 'clamp(1.1rem, 2.2vw, 1.4rem)', marginBottom: '1.25rem' }}>
-            Was WebCore ändert
+            Was MusterCore ändert
           </h2>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {DATA.gains.map((gain, i) => (

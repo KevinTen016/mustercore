@@ -366,7 +366,7 @@ export default function DemoQuiz() {
       {/* DSGVO-Hinweis — nur auf dem letzten Schritt (Kontaktdaten) */}
       {step === TOTAL && (
         <p style={{ marginTop: '1.25rem', fontSize: '0.76rem', color: 'var(--text-sub)', lineHeight: 1.55 }}>
-          Mit dem Absenden stimmen Sie der Verarbeitung Ihrer Kontaktdaten durch WebCore zu.{' '}
+          Mit dem Absenden stimmen Sie der Verarbeitung Ihrer Kontaktdaten durch MusterCore zu.{' '}
           <a href="/datenschutz" style={{ color: 'var(--accent)', textDecoration: 'underline', textUnderlineOffset: '2px' }}>
             Datenschutzerklärung
           </a>

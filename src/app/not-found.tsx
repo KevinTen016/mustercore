@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { TypewriterH1 } from '@/components/ui/TypewriterH1';
 
 export const metadata: Metadata = {
-  title: 'Seite nicht gefunden | WebCore',
+  title: 'Seite nicht gefunden | MusterCore',
   robots: { index: false, follow: false },
 };
 

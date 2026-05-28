@@ -6,7 +6,7 @@ import { TypewriterH1 } from '@/components/ui/TypewriterH1';
 export const metadata: Metadata = buildMetadata({
   title: 'Leistungen — Website, Buchungssystem & Admin-Panel',
   description:
-    'Was WebCore bietet: professionelle Website, Online-Buchungssystem und Admin-Panel für lokale Unternehmen in Deutschland. DSGVO-konform, EU-Hosting.',
+    'Was MusterCore bietet: professionelle Website, Online-Buchungssystem und Admin-Panel für lokale Unternehmen in Deutschland. DSGVO-konform, EU-Hosting.',
   path: '/leistungen',
 });
 
@@ -17,7 +17,7 @@ const LEISTUNGEN = [
     sub: 'Ihr Aushängeschild im Netz — ohne Agenturaufwand.',
     items: [
       'Moderne, mobiloptimierte Website auf bewährter Vorlage',
-      'Eigene Domain (ab STANDARD) oder Subdomain auf webcore.de (BASIS)',
+      'Eigene Domain (ab STANDARD) oder Subdomain auf mustercore.de (BASIS)',
       'HTTPS, schnelle Ladezeiten, Google-Lighthouse-Score über 90',
       'Dienstleistungsübersicht, Preisliste, Team-Vorstellung',
       'Impressum, Datenschutzerklärung und Cookie-Banner (DSGVO/TTDSG)',
@@ -83,7 +83,7 @@ export default function LeistungenPage() {
           Alles, was Ihr Betrieb braucht.
         </TypewriterH1>
         <p style={{ maxWidth: '58ch', marginBottom: '3.5rem' }}>
-          WebCore ist kein Baukasten — es ist ein vollständiges System: Website, Buchungssystem
+          MusterCore ist kein Baukasten — es ist ein vollständiges System: Website, Buchungssystem
           und Admin-Panel aus einer Hand, eingerichtet, betrieben und gewartet von uns.
         </p>
 

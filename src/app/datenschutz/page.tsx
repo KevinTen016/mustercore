@@ -5,7 +5,7 @@ import { TypewriterH1 } from '@/components/ui/TypewriterH1';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Datenschutzerklärung',
-  description: 'Datenschutzerklärung von WebCore gemäß DSGVO und TTDSG.',
+  description: 'Datenschutzerklärung von MusterCore gemäß DSGVO und TTDSG.',
   path: '/datenschutz',
   noindex: true,
 });

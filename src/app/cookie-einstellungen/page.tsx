@@ -5,7 +5,7 @@ import { TypewriterH1 } from '@/components/ui/TypewriterH1';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Cookie-Einstellungen',
-  description: 'Cookie-Einstellungen der WebCore Website anpassen — notwendige und optionale Cookies jederzeit verwalten.',
+  description: 'Cookie-Einstellungen der MusterCore Website anpassen — notwendige und optionale Cookies jederzeit verwalten.',
   path: '/cookie-einstellungen',
 });
 

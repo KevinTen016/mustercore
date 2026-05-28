@@ -6,7 +6,7 @@ import { TypewriterH1 } from '@/components/ui/TypewriterH1';
 export const metadata: Metadata = buildMetadata({
   title: 'Referenzen',
   description:
-    'Referenzen und Kundenprojekte von WebCore. Sprechen Sie uns direkt an — wir zeigen Ihnen gerne, wie das System in der Praxis aussieht.',
+    'Referenzen und Kundenprojekte von MusterCore. Sprechen Sie uns direkt an — wir zeigen Ihnen gerne, wie das System in der Praxis aussieht.',
   path: '/referenzen',
 });
 
@@ -21,7 +21,7 @@ export default function ReferenzenPage() {
           Unsere ersten Kunden sind in Vorbereitung.
         </TypewriterH1>
         <p style={{ maxWidth: '58ch', marginBottom: '3rem', fontSize: '1.05rem' }}>
-          WebCore befindet sich im Aufbau. Die ersten Kundenprojekte werden hier veröffentlicht,
+          MusterCore befindet sich im Aufbau. Die ersten Kundenprojekte werden hier veröffentlicht,
           sobald wir die Erlaubnis dazu erhalten haben.
         </p>
 
