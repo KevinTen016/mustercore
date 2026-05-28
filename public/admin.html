@@ -67,6 +67,90 @@
     input, select, textarea { font-family: var(--font); }
     ::selection { background: var(--beige); color: var(--black); }
 
+    /* ── Toggle switch ──────────────────────────── */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border-sub);
+    }
+    .toggle-row:last-of-type { border-bottom: none; }
+
+    .toggle-label { font-size: 0.88rem; color: var(--white); font-weight: 500; }
+    .toggle-sub   { font-size: 0.74rem; color: var(--white-dim); margin-top: 0.2rem; }
+
+    .toggle {
+      position: relative;
+      width: 42px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 16px; height: 16px;
+      left: 3px; top: 3px;
+      background: var(--white-dim);
+      border-radius: 50%;
+      transition: transform var(--transition), background var(--transition);
+    }
+    .toggle input:checked + .toggle-slider { background: var(--green); border-color: var(--green); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(18px); background: var(--black); }
+
+    /* ── IP list ─────────────────────────────────── */
+    .ip-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.3rem 0.6rem;
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.78rem;
+      font-family: monospace;
+      color: var(--beige-light);
+    }
+    .ip-tag button {
+      background: none; border: none;
+      color: var(--white-dim); cursor: pointer; padding: 0;
+      line-height: 1; font-size: 1rem;
+      transition: color var(--transition);
+    }
+    .ip-tag button:hover { color: var(--red); }
+
+    /* ── TOTP QR section ─────────────────────────── */
+    .totp-setup-box {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-top: 1rem;
+    }
+    .totp-secret {
+      font-family: monospace;
+      font-size: 0.82rem;
+      letter-spacing: 0.1em;
+      color: var(--beige-light);
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.5rem 0.75rem;
+      word-break: break-all;
+      user-select: all;
+    }
+
     /* ── Login ──────────────────────────────────── */
     #login-screen {
       min-height: 100vh;
@@ -903,7 +987,7 @@
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">
-      <div class="login-logo__name">Web<span>Core</span></div>
+      <div class="login-logo__name">Muster<span>Core</span></div>
       <div class="login-logo__sub">Admin · Interne Verwaltung</div>
     </div>
 
@@ -925,6 +1009,29 @@
     <div class="login-error" id="login-error"></div>
     <button class="login-btn" id="login-btn">Anmelden</button>
   </div>
+
+  <!-- MFA step — shown after successful password when 2FA is active -->
+  <div class="login-box" id="mfa-box" style="display:none;">
+    <div class="login-logo">
+      <div class="login-logo__name">Muster<span>Core</span></div>
+      <div class="login-logo__sub">Zwei-Faktor-Authentifizierung</div>
+    </div>
+    <p style="font-size:0.8rem;color:var(--white-dim);text-align:center;margin-bottom:1.25rem;">
+      Geben Sie den 6-stelligen Code aus Ihrer Authenticator-App ein.
+    </p>
+    <div class="login-group">
+      <label class="login-label" for="mfa-code">Code</label>
+      <input class="login-input" type="text" id="mfa-code" placeholder="000000"
+        autocomplete="one-time-code" inputmode="numeric" maxlength="6"
+        style="text-align:center;font-size:1.4rem;letter-spacing:0.25em;" />
+    </div>
+    <div class="login-error" id="mfa-error"></div>
+    <button class="login-btn" id="mfa-btn">Bestätigen</button>
+    <button id="mfa-back"
+      style="width:100%;margin-top:0.6rem;background:none;border:none;color:var(--white-dim);font-size:0.78rem;cursor:pointer;text-decoration:underline;">
+      Zurück zur Anmeldung
+    </button>
+  </div>
 </div>
 
 <!-- ═══════════════════════════════════════════════
@@ -936,7 +1043,7 @@
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar__brand">
-      <div class="sidebar__brand-name">Web<span>Core</span></div>
+      <div class="sidebar__brand-name">Muster<span>Core</span></div>
       <div class="sidebar__brand-sub">Admin-Bereich</div>
     </div>
 
@@ -976,6 +1083,14 @@
         </svg>
         Nachrichten
         <span class="nav-badge" id="badge-nachrichten">0</span>
+      </button>
+
+      <button class="nav-item" data-tab="sicherheit">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M8 1L2 4v4c0 3.5 2.7 6 6 7 3.3-1 6-3.5 6-7V4L8 1z" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M5.5 8l1.5 1.5L10.5 6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Sicherheit
       </button>
     </nav>
 
@@ -1188,6 +1303,38 @@
           </div>
         </div>
       </div>
+
+      <!-- ══ TAB: SICHERHEIT ════════════════════════ -->
+      <div class="tab-panel" id="tab-sicherheit">
+
+        <!-- 2FA -->
+        <div class="card" style="margin-bottom:1.5rem;">
+          <div class="card__header">
+            <div>
+              <div class="card__title">Zwei-Faktor-Authentifizierung (2FA)</div>
+              <div class="card__subtitle">TOTP-basiert · kompatibel mit Google Authenticator, Authy und anderen</div>
+            </div>
+            <span id="totp-status-badge"></span>
+          </div>
+          <div style="padding:1.25rem 1.75rem;" id="totp-section">
+            <div style="text-align:center;color:var(--white-dim);font-size:0.82rem;padding:1rem;">Wird geladen…</div>
+          </div>
+        </div>
+
+        <!-- IP-Whitelist -->
+        <div class="card">
+          <div class="card__header">
+            <div>
+              <div class="card__title">IP-Whitelist</div>
+              <div class="card__subtitle">Zugriff auf den Admin-Bereich auf bestimmte IP-Adressen beschränken</div>
+            </div>
+          </div>
+          <div style="padding:1.25rem 1.75rem;" id="ip-section">
+            <div style="text-align:center;color:var(--white-dim);font-size:0.82rem;padding:1rem;">Wird geladen…</div>
+          </div>
+        </div>
+
+      </div><!-- /#tab-sicherheit -->
 
     </div><!-- /.content -->
   </div><!-- /.main -->

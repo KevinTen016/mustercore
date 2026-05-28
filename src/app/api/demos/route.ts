@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
-import { isAuthed } from '@/lib/session';
+import { checkAccess, accessDenied } from '@/lib/access';
 import { db } from '@/lib/db';
 import { logger } from '@/lib/logger';
 
 export async function GET(req: Request) {
-  if (!isAuthed(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const access = await checkAccess(req);
+  if (!access.ok) return accessDenied(access);
   try {
     return NextResponse.json(await db.demos.list());
   } catch (err) {

@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { createSession, SESSION_COOKIE } from '@/lib/session';
+import { getAdminSettings, isIPAllowed } from '@/lib/admin-settings';
+import { createMfaToken } from '@/lib/mfa-state';
+import { authenticator } from 'otplib';
 
 const MAX_AGE = 8 * 60 * 60;
 
@@ -143,7 +146,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Ungültige Anfrage' }, { status: 400 });
   }
 
-  const validUser = process.env.ADMIN_USER as string; // guaranteed non-null by check above
+  const validUser = process.env.ADMIN_USER as string;
   const userBufA  = Buffer.from(username);
   const userBufB  = Buffer.from(validUser);
   const userLen   = Math.max(userBufA.length, userBufB.length);
@@ -159,8 +162,26 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Benutzername oder Passwort falsch.' }, { status: 401 });
   }
 
+  // ── IP whitelist check (post-auth, before session) ──────────────────────
+  const settings = await getAdminSettings();
+  if (!isIPAllowed(ip, settings)) {
+    recordFailedLogin(ip);
+    return NextResponse.json(
+      { error: 'Zugriff von dieser IP-Adresse nicht erlaubt.' },
+      { status: 403 },
+    );
+  }
+
   loginAttempts.delete(ip);
 
+  // ── TOTP challenge if 2FA is active ────────────────────────────────────
+  if (settings.totpEnabled && settings.totpSecret) {
+    authenticator.options = { window: 1 };
+    const mfaToken = createMfaToken(ip);
+    return NextResponse.json({ requiresMfa: true, mfaToken }, { status: 200 });
+  }
+
+  // ── No 2FA — create session immediately ───────────────────────────────
   const token = createSession();
   const res = NextResponse.json({ ok: true });
   res.cookies.set(SESSION_COOKIE, token, {

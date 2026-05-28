@@ -55,3 +55,15 @@ model Nachricht {
   @@index([deletedAt])
   @@map("nachrichten")
 }
+
+model AdminSettings {
+  id                 String   @id @default("singleton")
+  totpEnabled        Boolean  @default(false)
+  totpSecret         String?  @db.Text
+  totpPendingSecret  String?  @db.Text
+  ipWhitelistEnabled Boolean  @default(false)
+  ipWhitelist        String[]
+  updatedAt          DateTime @default(now()) @updatedAt
+
+  @@map("admin_settings")
+}

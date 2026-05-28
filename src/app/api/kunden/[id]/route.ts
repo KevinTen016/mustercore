@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
-import { isAuthed } from '@/lib/session';
+import { checkAccess, accessDenied } from '@/lib/access';
 import { db } from '@/lib/db';
 import { logger } from '@/lib/logger';
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!isAuthed(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const access = await checkAccess(req);
+  if (!access.ok) return accessDenied(access);
 
   const { id } = await params;
 
@@ -55,7 +56,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 }
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!isAuthed(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const access = await checkAccess(req);
+  if (!access.ok) return accessDenied(access);
   const { id } = await params;
   try {
     const ok = await db.kunden.remove(id);

@@ -53,6 +53,7 @@ const LEISTUNGEN = [
       'Erweiterte Statistik: Mitarbeiter-Dynamik, MoM-Vergleich (PREMIUM)',
       'CSV/Excel-Export für die Buchhaltung',
       'Mobil nutzbar — kein App-Download nötig',
+      'Sicherheitseinstellungen direkt im Admin: 2FA und IP-Whitelist',
     ],
   },
   {
@@ -66,7 +67,11 @@ const LEISTUNGEN = [
       'EU-Hosting: Rechenzentrum in Deutschland',
       'Eigener, isolierter Container pro Kunde — keine Datenvermischung',
       'Tägliche verschlüsselte Backups, 30 Tage Aufbewahrung',
-      'HTTPS und aktuelle Sicherheitsheader',
+      'HTTPS und aktuelle Sicherheitsheader (HSTS, CSP)',
+      'Zwei-Faktor-Authentifizierung (TOTP) für den Admin-Zugang',
+      'IP-Whitelist: Admin-Zugriff auf vertrauenswürdige IPs beschränkbar',
+      'Passwort-Hashing mit scrypt (OWASP-empfohlen) statt MD5/bcrypt',
+      'Rate-Limiting und automatische Brute-Force-Sperre am Login',
     ],
   },
 ];

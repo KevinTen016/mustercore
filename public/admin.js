@@ -1,16 +1,18 @@
 'use strict';
 
 const TAB_META = {
-  stats:        { title: 'Übersicht',      meta: 'Kennzahlen & Aktivität' },
-  kunden:       { title: 'Kunden',         meta: 'Aktive Abonnenten verwalten' },
-  demos:        { title: 'Demo-Anfragen',  meta: 'Eingehende Leads' },
-  nachrichten:  { title: 'Nachrichten',    meta: 'Kontaktformular-Eingänge' },
+  stats:       { title: 'Übersicht',      meta: 'Kennzahlen & Aktivität' },
+  kunden:      { title: 'Kunden',         meta: 'Aktive Abonnenten verwalten' },
+  demos:       { title: 'Demo-Anfragen',  meta: 'Eingehende Leads' },
+  nachrichten: { title: 'Nachrichten',    meta: 'Kontaktformular-Eingänge' },
+  sicherheit:  { title: 'Sicherheit',     meta: '2FA & IP-Whitelist' },
 };
 
 // ═══ DATA (server-backed) ═════════════════════════
 let KUNDEN       = [];
 let DEMOS        = [];
 let NACHRICHTEN  = [];
+let SETTINGS     = { totpEnabled: false, totpConfigured: false, ipWhitelistEnabled: false, ipWhitelist: [], myIp: '' };
 
 async function loadData() {
   const results = await Promise.allSettled([
@@ -35,8 +37,18 @@ async function loadData() {
 }
 
 // ═══ AUTH ═════════════════════════════════════════
+let _mfaToken = '';
+
 document.getElementById('login-btn').addEventListener('click', login);
 document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+document.getElementById('mfa-btn').addEventListener('click', submitMfa);
+document.getElementById('mfa-code').addEventListener('keydown', e => { if (e.key === 'Enter') submitMfa(); });
+document.getElementById('mfa-back').addEventListener('click', () => {
+  document.getElementById('mfa-box').style.display = 'none';
+  document.querySelector('.login-box').style.display = '';
+  document.getElementById('login-error').textContent = '';
+  _mfaToken = '';
+});
 
 async function login() {
   const u   = document.getElementById('login-user').value.trim();
@@ -44,25 +56,71 @@ async function login() {
   const err = document.getElementById('login-error');
   err.textContent = '';
 
-  let res;
+  let res, data;
   try {
-    res = await fetch('/api/auth/login', {
+    res  = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: u, password: p }),
     });
+    data = await res.json().catch(() => ({}));
   } catch {
     err.textContent = 'Verbindungsfehler. Bitte erneut versuchen.';
     return;
   }
 
-  if (res.ok) {
-    await loadData();
-    showApp();
-  } else {
-    const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
     err.textContent = data.error || 'Benutzername oder Passwort falsch.';
+    return;
   }
+
+  if (data.requiresMfa) {
+    _mfaToken = data.mfaToken || '';
+    document.querySelector('.login-box').style.display = 'none';
+    document.getElementById('mfa-box').style.display = '';
+    document.getElementById('mfa-code').value = '';
+    document.getElementById('mfa-error').textContent = '';
+    setTimeout(() => document.getElementById('mfa-code').focus(), 50);
+    return;
+  }
+
+  await loadData();
+  showApp();
+}
+
+async function submitMfa() {
+  const code = document.getElementById('mfa-code').value.replace(/\s/g, '');
+  const err  = document.getElementById('mfa-error');
+  err.textContent = '';
+  if (!code) { err.textContent = 'Bitte Code eingeben.'; return; }
+
+  let res, data;
+  try {
+    res  = await fetch('/api/auth/mfa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mfaToken: _mfaToken, code }),
+    });
+    data = await res.json().catch(() => ({}));
+  } catch {
+    err.textContent = 'Verbindungsfehler. Bitte erneut versuchen.';
+    return;
+  }
+
+  if (!res.ok) {
+    err.textContent = data.error || 'Ungültiger Code.';
+    if (res.status === 401 && (data.error || '').includes('neu anmelden')) {
+      setTimeout(() => {
+        document.getElementById('mfa-box').style.display = 'none';
+        document.querySelector('.login-box').style.display = '';
+        _mfaToken = '';
+      }, 2000);
+    }
+    return;
+  }
+
+  await loadData();
+  showApp();
 }
 
 document.getElementById('logout-btn').addEventListener('click', async () => {
@@ -116,6 +174,7 @@ function switchTab(tabId) {
   if (tabId === 'kunden')      renderKunden();
   if (tabId === 'demos')       renderDemos();
   if (tabId === 'nachrichten') renderNachrichten();
+  if (tabId === 'sicherheit')  renderSicherheit();
 }
 
 // ═══ SIDEBAR MOBILE ═══════════════════════════════
@@ -492,6 +551,282 @@ function updateBadges() {
   document.getElementById('badge-kunden').textContent      = KUNDEN.filter(k => k.status === 'aktiv' || k.status === 'trial').length;
   document.getElementById('badge-demos').textContent       = DEMOS.filter(d => d.status === 'neu').length;
   document.getElementById('badge-nachrichten').textContent = NACHRICHTEN.filter(n => n.status === 'neu').length;
+}
+
+// ═══ SICHERHEIT ═══════════════════════════════════
+
+async function loadSettings() {
+  try {
+    const res = await fetch('/api/settings');
+    if (res.ok) SETTINGS = await res.json();
+  } catch {
+    toast('Einstellungen konnten nicht geladen werden.', 'error');
+  }
+}
+
+async function renderSicherheit() {
+  await loadSettings();
+  renderTotpSection();
+  renderIpSection();
+}
+
+// ── 2FA ────────────────────────────────────────────
+function renderTotpSection() {
+  const badge = document.getElementById('totp-status-badge');
+  const el    = document.getElementById('totp-section');
+  if (!el) return;
+
+  if (SETTINGS.totpEnabled) {
+    badge.innerHTML = '<span class="badge badge--aktiv">Aktiv</span>';
+    el.innerHTML = `
+      <p style="font-size:0.86rem;color:var(--white-dim);margin-bottom:1rem;">
+        Zwei-Faktor-Authentifizierung ist <strong style="color:var(--green);">aktiv</strong>.
+        Beim nächsten Login wird nach dem Passwort ein 6-stelliger Code aus Ihrer Authenticator-App abgefragt.
+      </p>
+      <div class="form-group" style="max-width:240px;">
+        <label class="form-label">Aktueller Code zum Deaktivieren</label>
+        <input class="form-control" type="text" id="totp-disable-code" placeholder="000000"
+          inputmode="numeric" maxlength="6" style="letter-spacing:0.15em;text-align:center;" />
+      </div>
+      <button class="btn btn-danger" id="btn-totp-disable">2FA deaktivieren</button>`;
+    el.querySelector('#btn-totp-disable').addEventListener('click', disableTotp);
+  } else {
+    badge.innerHTML = '<span class="badge badge--inaktiv">Deaktiviert</span>';
+    el.innerHTML = `
+      <p style="font-size:0.86rem;color:var(--white-dim);margin-bottom:1rem;">
+        Zwei-Faktor-Authentifizierung ist <strong style="color:var(--white-dim);">deaktiviert</strong>.
+        Aktivieren Sie TOTP, um Ihren Admin-Zugang mit einem zweiten Faktor zu schützen.
+      </p>
+      <button class="btn btn-beige" id="btn-totp-setup">2FA einrichten</button>
+      <div id="totp-setup-area"></div>`;
+    el.querySelector('#btn-totp-setup').addEventListener('click', startTotpSetup);
+  }
+}
+
+async function startTotpSetup() {
+  const area = document.getElementById('totp-setup-area');
+  area.innerHTML = '<p style="margin-top:1rem;font-size:0.82rem;color:var(--white-dim);">QR-Code wird generiert…</p>';
+
+  let data;
+  try {
+    const res = await fetch('/api/settings/totp', { method: 'POST' });
+    data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Fehler');
+  } catch (e) {
+    area.innerHTML = `<p style="color:var(--red);margin-top:1rem;font-size:0.82rem;">Fehler: ${esc(e.message)}</p>`;
+    return;
+  }
+
+  area.innerHTML = `
+    <div class="totp-setup-box">
+      <p style="font-size:0.86rem;color:var(--white-dim);margin-bottom:1rem;">
+        Scannen Sie den QR-Code mit Ihrer Authenticator-App (z.B. Google Authenticator, Authy).
+      </p>
+      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:flex-start;margin-bottom:1.25rem;">
+        <img src="${data.qrDataUrl}" alt="QR-Code" width="160" height="160"
+          style="border:4px solid white;border-radius:8px;background:white;" />
+        <div style="flex:1;min-width:180px;">
+          <div class="form-label" style="margin-bottom:0.4rem;">Manueller Schlüssel</div>
+          <div class="totp-secret" id="totp-secret-text">${esc(data.secret)}</div>
+          <p style="font-size:0.72rem;color:var(--white-dim);margin-top:0.5rem;">
+            Tippen Sie diesen Schlüssel ein, falls der QR-Scan nicht funktioniert.
+          </p>
+        </div>
+      </div>
+      <div class="form-group" style="max-width:240px;">
+        <label class="form-label">Code aus der App eingeben</label>
+        <input class="form-control" type="text" id="totp-verify-code" placeholder="000000"
+          inputmode="numeric" maxlength="6" style="letter-spacing:0.15em;text-align:center;" />
+      </div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+        <button class="btn btn-beige" id="btn-totp-activate">2FA aktivieren</button>
+        <button class="btn btn-ghost" id="btn-totp-cancel">Abbrechen</button>
+      </div>
+    </div>`;
+
+  area.querySelector('#btn-totp-activate').addEventListener('click', activateTotp);
+  area.querySelector('#btn-totp-cancel').addEventListener('click', () => {
+    area.innerHTML = '';
+  });
+}
+
+async function activateTotp() {
+  const code = document.getElementById('totp-verify-code')?.value?.replace(/\s/g, '') || '';
+  if (!code) { toast('Bitte Code eingeben.', 'error'); return; }
+
+  let res, data;
+  try {
+    res  = await fetch('/api/settings/totp/activate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code }),
+    });
+    data = await res.json();
+  } catch {
+    toast('Verbindungsfehler.', 'error');
+    return;
+  }
+
+  if (!res.ok) {
+    toast(data.error || 'Aktivierung fehlgeschlagen.', 'error');
+    return;
+  }
+
+  SETTINGS.totpEnabled = true;
+  SETTINGS.totpConfigured = true;
+  toast('2FA erfolgreich aktiviert!', 'success');
+  renderTotpSection();
+}
+
+async function disableTotp() {
+  const code = document.getElementById('totp-disable-code')?.value?.replace(/\s/g, '') || '';
+  if (!code) { toast('Bitte aktuellen Code eingeben.', 'error'); return; }
+
+  let res, data;
+  try {
+    res  = await fetch('/api/settings/totp', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code }),
+    });
+    data = await res.json();
+  } catch {
+    toast('Verbindungsfehler.', 'error');
+    return;
+  }
+
+  if (!res.ok) {
+    toast(data.error || 'Deaktivierung fehlgeschlagen.', 'error');
+    return;
+  }
+
+  SETTINGS.totpEnabled = false;
+  SETTINGS.totpConfigured = false;
+  toast('2FA deaktiviert.', 'info');
+  renderTotpSection();
+}
+
+// ── IP Whitelist ────────────────────────────────────
+function renderIpSection() {
+  const el = document.getElementById('ip-section');
+  if (!el) return;
+
+  const list = SETTINGS.ipWhitelist || [];
+  const enabled = SETTINGS.ipWhitelistEnabled;
+  const myIp = SETTINGS.myIp || '';
+
+  el.innerHTML = `
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">IP-Whitelist aktivieren</div>
+        <div class="toggle-sub">
+          Wenn aktiv, darf nur von den unten eingetragenen IP-Adressen auf den Admin zugegriffen werden.
+          Localhost (127.0.0.1 / ::1) ist immer erlaubt.
+        </div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="toggle-whitelist" ${enabled ? 'checked' : ''} />
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    ${!enabled && list.length === 0 ? `
+    <div style="margin:0.75rem 0;padding:0.75rem 1rem;background:rgba(224,96,96,0.07);border:1px solid rgba(224,96,96,0.2);border-radius:var(--radius);font-size:0.78rem;color:var(--red);">
+      ⚠ Tragen Sie Ihre IP-Adresse ein, <strong>bevor</strong> Sie die Whitelist aktivieren — sonst sperren Sie sich aus.
+    </div>` : ''}
+
+    <div style="margin-top:1rem;">
+      <div class="form-label" style="margin-bottom:0.6rem;">Erlaubte IP-Adressen</div>
+      <div id="ip-tag-list" style="display:flex;flex-wrap:wrap;gap:0.4rem;min-height:2rem;margin-bottom:0.75rem;">
+        ${list.length ? list.map(ip => `
+          <span class="ip-tag">
+            ${esc(ip)}
+            <button data-ip="${esc(ip)}" title="Entfernen" aria-label="IP entfernen">×</button>
+          </span>`).join('') : `<span style="font-size:0.78rem;color:var(--white-dim);align-self:center;">Keine IPs eingetragen</span>`}
+      </div>
+
+      ${myIp ? `<p style="font-size:0.74rem;color:var(--white-dim);margin-bottom:0.6rem;">
+        Ihre aktuelle IP: <code style="background:var(--surface-3);padding:0.1em 0.4em;border-radius:3px;font-family:monospace;">${esc(myIp)}</code>
+        <button class="btn btn-ghost btn-sm" id="btn-add-my-ip" style="margin-left:0.5rem;font-size:0.72rem;padding:0.2rem 0.5rem;">Hinzufügen</button>
+      </p>` : ''}
+
+      <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+        <input class="form-control" type="text" id="ip-input"
+          placeholder="z.B. 1.2.3.4 oder 1.2.3.0/24"
+          style="width:220px;padding:0.5rem 0.75rem;font-size:0.84rem;font-family:monospace;" />
+        <button class="btn btn-ghost" id="btn-add-ip">+ Hinzufügen</button>
+      </div>
+    </div>`;
+
+  el.querySelector('#toggle-whitelist').addEventListener('change', async e => {
+    const checked = e.target.checked;
+    if (checked && list.length === 0) {
+      toast('Keine IPs eingetragen — bitte erst IPs hinzufügen.', 'error');
+      e.target.checked = false;
+      return;
+    }
+    await patchIpSettings({ ipWhitelistEnabled: checked });
+  });
+
+  el.querySelectorAll('.ip-tag button[data-ip]').forEach(btn =>
+    btn.addEventListener('click', () => removeIp(btn.dataset.ip)));
+
+  el.querySelector('#btn-add-ip')?.addEventListener('click', addIpFromInput);
+  el.querySelector('#ip-input')?.addEventListener('keydown', e => { if (e.key === 'Enter') addIpFromInput(); });
+  el.querySelector('#btn-add-my-ip')?.addEventListener('click', () => {
+    if (myIp) addIp(myIp);
+  });
+}
+
+async function addIpFromInput() {
+  const input = document.getElementById('ip-input');
+  const ip = (input?.value || '').trim();
+  if (!ip) { toast('Bitte IP-Adresse eingeben.', 'error'); return; }
+  await addIp(ip);
+  if (input) input.value = '';
+}
+
+async function addIp(ip) {
+  if ((SETTINGS.ipWhitelist || []).includes(ip)) {
+    toast('Diese IP ist bereits eingetragen.', 'info');
+    return;
+  }
+  const newList = [...(SETTINGS.ipWhitelist || []), ip];
+  await patchIpSettings({ ipWhitelist: newList });
+}
+
+async function removeIp(ip) {
+  const newList = (SETTINGS.ipWhitelist || []).filter(x => x !== ip);
+  if (SETTINGS.ipWhitelistEnabled && newList.length === 0) {
+    toast('Whitelist deaktiviert, da keine IPs mehr vorhanden.', 'info');
+    await patchIpSettings({ ipWhitelist: newList, ipWhitelistEnabled: false });
+  } else {
+    await patchIpSettings({ ipWhitelist: newList });
+  }
+}
+
+async function patchIpSettings(updates) {
+  let res, data;
+  try {
+    res  = await fetch('/api/settings', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    });
+    data = await res.json();
+  } catch {
+    toast('Verbindungsfehler.', 'error');
+    return;
+  }
+
+  if (!res.ok) {
+    toast(data.error || 'Fehler beim Speichern.', 'error');
+    return;
+  }
+
+  SETTINGS = { ...SETTINGS, ...data };
+  toast('Einstellungen gespeichert.', 'success');
+  renderIpSection();
 }
 
 // ═══ UTILS ════════════════════════════════════════
