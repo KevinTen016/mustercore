@@ -2,8 +2,6 @@
 
 A full-stack WaaS (Website-as-a-Service) platform built for local German businesses — hairdressers, medical practices, auto shops. Includes a public marketing site, a demo request flow, and a password-protected admin panel.
 
-**Live demo:** [link once deployed]
-
 > This is a portfolio/demo project. All company data is fictional. Admin credentials below.
 
 ---
