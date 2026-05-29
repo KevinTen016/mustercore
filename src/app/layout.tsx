@@ -24,8 +24,38 @@ export const metadata: Metadata = {
     siteName: 'MusterCore',
     locale: 'de_DE',
     type: 'website',
-    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'MusterCore — Website & Online-Buchung für lokale Unternehmen' }],
   },
+};
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://mustercore.de';
+
+const orgSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'MusterCore',
+  url: BASE_URL,
+  logo: `${BASE_URL}/favicon.svg`,
+  description:
+    'MusterCore gibt lokalen Unternehmen eine professionelle Website mit Online-Buchung und eigenem Admin-Panel. DSGVO-konform, EU-Hosting, aus Braunschweig.',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Braunschweig',
+    addressRegion: 'Niedersachsen',
+    addressCountry: 'DE',
+  },
+  contactPoint: {
+    '@type': 'ContactPoint',
+    contactType: 'customer service',
+    availableLanguage: 'German',
+  },
+};
+
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'MusterCore',
+  url: BASE_URL,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -34,6 +64,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <meta name="format-detection" content="telephone=no" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
       </head>
       <body>
         <a href="#main-content" className="skip-link">Zum Hauptinhalt springen</a>

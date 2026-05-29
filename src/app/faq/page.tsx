@@ -135,8 +135,25 @@ const CATEGORIES = [
   },
 ];
 
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: CATEGORIES.flatMap(cat =>
+    cat.items.map(item => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: { '@type': 'Answer', text: item.a },
+    })),
+  ),
+};
+
 export default function FaqPage() {
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
     <div style={{ paddingBlock: 'clamp(4rem, 10vw, 7rem)' }}>
       <div className="container" style={{ maxWidth: '800px' }}>
         <p style={{ fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: '0.75rem' }}>
@@ -232,5 +249,6 @@ export default function FaqPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
