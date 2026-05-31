@@ -14,18 +14,18 @@ import '@/styles/globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: 'MusterCore — Professionelle Website & Buchungssystem für lokale Unternehmen',
+    default: 'MusterCore — Professionelle Website & Admin-Panel für lokale Unternehmen',
     template: '%s | MusterCore',
   },
   description:
-    'MusterCore gibt lokalen Unternehmen eine professionelle Website mit Online-Buchung und eigenem Admin-Panel. DSGVO-konform, EU-Hosting, aus Braunschweig.',
+    'MusterCore gibt lokalen Unternehmen eine professionelle Website mit eigenem Admin-Panel. DSGVO-konform, EU-Hosting, aus Braunschweig.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'https://mustercore.de'),
   robots: { index: true, follow: true },
   openGraph: {
     siteName: 'MusterCore',
     locale: 'de_DE',
     type: 'website',
-    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'MusterCore — Website & Online-Buchung für lokale Unternehmen' }],
+    images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'MusterCore — Website & Admin-Panel für lokale Unternehmen' }],
   },
 };
 
@@ -38,7 +38,7 @@ const orgSchema = {
   url: BASE_URL,
   logo: `${BASE_URL}/favicon.svg`,
   description:
-    'MusterCore gibt lokalen Unternehmen eine professionelle Website mit Online-Buchung und eigenem Admin-Panel. DSGVO-konform, EU-Hosting, aus Braunschweig.',
+    'MusterCore gibt lokalen Unternehmen eine professionelle Website mit eigenem Admin-Panel. DSGVO-konform, EU-Hosting, aus Braunschweig.',
   address: {
     '@type': 'PostalAddress',
     addressLocality: 'Braunschweig',

@@ -4,9 +4,9 @@ import { buildMetadata } from '@/lib/seo';
 import { TypewriterH1 } from '@/components/ui/TypewriterH1';
 
 export const metadata: Metadata = buildMetadata({
-  title: 'Leistungen — Website, Buchungssystem & Admin-Panel',
+  title: 'Leistungen — Website & Admin-Panel',
   description:
-    'Was MusterCore bietet: professionelle Website, Online-Buchungssystem und Admin-Panel für lokale Unternehmen in Deutschland. DSGVO-konform, EU-Hosting.',
+    'Was MusterCore bietet: professionelle Website und Admin-Panel für lokale Unternehmen in Deutschland. DSGVO-konform, EU-Hosting.',
   path: '/leistungen',
 });
 
@@ -27,21 +27,6 @@ const LEISTUNGEN = [
   },
   {
     num: '02',
-    title: 'Online-Buchungssystem',
-    sub: 'Termine rund um die Uhr — ohne Telefonanruf.',
-    items: [
-      'Buchungsseite direkt in Ihre Website integriert',
-      'Keine App, kein Kunden-Account nötig',
-      'Kunden wählen Dienstleistung, Mitarbeiter, Datum und Uhrzeit',
-      'Automatische E-Mail-Bestätigung nach jeder Buchung',
-      'Automatische Erinnerung 24 h vor dem Termin (E-Mail)',
-      'SMS-Erinnerungen (ab PREMIUM)',
-      'Telegram-Benachrichtigung für Sie und Ihr Team (ab STANDARD)',
-      'Buchungen, Stornierungen und Umbuchungen ohne Ihren Eingriff',
-    ],
-  },
-  {
-    num: '03',
     title: 'Admin-Panel',
     sub: 'Ihr Betrieb — vollständig im Überblick, immer im Browser.',
     items: [
@@ -57,7 +42,7 @@ const LEISTUNGEN = [
     ],
   },
   {
-    num: '04',
+    num: '03',
     title: 'DSGVO-Paket & Sicherheit',
     sub: 'Rechtssicher von Anfang an — kein Nachgedanke.',
     items: [
@@ -88,8 +73,8 @@ export default function LeistungenPage() {
           Alles, was Ihr Betrieb braucht.
         </TypewriterH1>
         <p style={{ maxWidth: '58ch', marginBottom: '3.5rem' }}>
-          MusterCore ist kein Baukasten — es ist ein vollständiges System: Website, Buchungssystem
-          und Admin-Panel aus einer Hand, eingerichtet, betrieben und gewartet von uns.
+          MusterCore ist kein Baukasten — es ist ein vollständiges System: Website und Admin-Panel
+          aus einer Hand, eingerichtet, betrieben und gewartet von uns.
         </p>
 
         {/* Leistungs-Blöcke */}

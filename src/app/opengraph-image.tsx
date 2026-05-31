@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
-export const alt = 'MusterCore — Website & Online-Buchung für lokale Unternehmen';
+export const alt = 'MusterCore — Website & Admin-Panel für lokale Unternehmen';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -64,7 +64,7 @@ export default function OGImage() {
             marginBottom: 56,
           }}
         >
-          Website, Online-Buchung und Admin-Panel — eingerichtet in einer Woche, DSGVO-konform.
+          Website und Admin-Panel — eingerichtet in einer Woche, DSGVO-konform.
         </div>
 
         {/* Badges */}

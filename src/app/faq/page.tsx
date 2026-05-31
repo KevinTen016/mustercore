@@ -6,7 +6,7 @@ import { TypewriterH1 } from '@/components/ui/TypewriterH1';
 export const metadata: Metadata = buildMetadata({
   title: 'FAQ — Häufige Fragen',
   description:
-    'Häufig gestellte Fragen zu MusterCore: Preise, DSGVO, Kündigung, Datensicherheit, Buchungssystem und mehr.',
+    'Häufig gestellte Fragen zu MusterCore: Preise, DSGVO, Kündigung, Datensicherheit und mehr.',
   path: '/faq',
 });
 
@@ -61,7 +61,7 @@ const CATEGORIES = [
   },
   {
     id: 'buchungssystem',
-    title: 'Buchungssystem & Funktionen',
+    title: 'Funktionen & Admin-Panel',
     items: [
       {
         q: 'Wie buchen meine Kunden einen Termin?',

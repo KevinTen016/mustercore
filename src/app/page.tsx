@@ -10,7 +10,7 @@ import s from './page.module.css';
 export const metadata: Metadata = buildMetadata({
   title: 'MusterCore',
   description:
-    'MusterCore gibt lokalen Unternehmen — Friseursalons, Praxen, Werkstätten — eine professionelle Website mit Online-Buchung und eigenem Admin-Panel. DSGVO-konform, EU-Hosting, aus Braunschweig.',
+    'MusterCore gibt lokalen Unternehmen — Friseursalons, Praxen, Werkstätten — eine professionelle Website mit eigenem Admin-Panel. DSGVO-konform, EU-Hosting, aus Braunschweig.',
   path: '/',
 });
 
@@ -73,7 +73,7 @@ export default function HomePage() {
 
               <p className={s.heroSub}>
                 MusterCore gibt Ihrem Salon, Ihrer Praxis oder Werkstatt eine professionelle
-                Online-Präsenz mit eingebautem Buchungssystem — eingerichtet in einer Woche,
+                Online-Präsenz mit eigenem Admin-Panel — eingerichtet in einer Woche,
                 ohne Agentur-Aufwand, mit voller DSGVO-Sicherheit.
               </p>
 
@@ -312,7 +312,7 @@ export default function HomePage() {
             <div className={s.warumVisual} aria-hidden="true">
               <div className={s.warumVisualTitle}>Direktvergleich</div>
               {[
-                { left: 'Jimdo / Wix / Squarespace', right: 'Echtes Buchungssystem' },
+                { left: 'Jimdo / Wix / Squarespace', right: 'Professionelles Admin-Panel' },
                 { left: 'Shared Hosting', right: 'Eigener Container' },
                 { left: 'Agentur-Vertrag', right: 'Monatlich kündbar' },
                 { left: 'Google-CDN Fonts', right: 'EU-konformes Hosting' },
