@@ -1,6 +1,6 @@
 .banner {
   position: fixed;
-  bottom: 0;
+  bottom: var(--demo-bar-h, 0px);
   left: 0;
   right: 0;
   z-index: 500;
