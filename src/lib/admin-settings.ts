@@ -25,20 +25,18 @@ if (!('_adminSettingsCache' in _gc)) _gc._adminSettingsCache = null;
 
 export async function getAdminSettings(): Promise<AdminSettings> {
   if (_gc._adminSettingsCache) return _gc._adminSettingsCache;
-  try {
-    const row = await prisma.adminSettings.findUnique({ where: { id: 'singleton' } });
-    _gc._adminSettingsCache = row
-      ? {
-          totpEnabled: row.totpEnabled,
-          totpSecret: row.totpSecret,
-          totpPendingSecret: row.totpPendingSecret,
-          ipWhitelistEnabled: row.ipWhitelistEnabled,
-          ipWhitelist: row.ipWhitelist,
-        }
-      : { ...DEFAULT };
-  } catch {
-    return { ...DEFAULT };
-  }
+  // No catch: DB failure propagates as 500 (fail-closed) instead of silently
+  // disabling TOTP and IP whitelist via DEFAULT fallback.
+  const row = await prisma.adminSettings.findUnique({ where: { id: 'singleton' } });
+  _gc._adminSettingsCache = row
+    ? {
+        totpEnabled: row.totpEnabled,
+        totpSecret: row.totpSecret,
+        totpPendingSecret: row.totpPendingSecret,
+        ipWhitelistEnabled: row.ipWhitelistEnabled,
+        ipWhitelist: row.ipWhitelist,
+      }
+    : { ...DEFAULT };
   return _gc._adminSettingsCache!;
 }
 
@@ -69,7 +67,9 @@ export function invalidateSettingsCache(): void {
 // Localhost is always allowed — prevents accidental self-lockout.
 export function isIPAllowed(ip: string, settings: AdminSettings): boolean {
   if (!settings.ipWhitelistEnabled || settings.ipWhitelist.length === 0) return true;
-  if (['127.0.0.1', '::1', '::ffff:127.0.0.1', 'unknown'].includes(ip)) return true;
+  if (['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(ip)) return true;
+  // 'unknown' (missing x-forwarded-for) → deny when whitelist is active (fail-closed)
+  if (ip === 'unknown') return false;
   return settings.ipWhitelist.some(pattern =>
     pattern.includes('/') ? matchesCIDR(ip, pattern) : ip === pattern,
   );
